@@ -14,7 +14,7 @@ class AsyncDatabaseSession:
 
     async def init(self):
         self._engine = create_async_engine(
-            "postgresql+asyncpg://postgres:postgres@localhost/fleetdb",
+            "postgresql+asyncpg://postgres:postgres@localhost/fleet_db",
             echo=True,
         )
 

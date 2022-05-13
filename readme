@@ -1,0 +1,25 @@
+Xây dựng 1 backend application để quản lý 1 vài table (ví dụ là đội xe):
+-Cho phép thêm/sửa/xóa/list ra các đội xe
+-Cho phép thêm/sửa/xóa/list ra các xe trong đội xe (khóa chính liên kết tới đội xe)
+-Cho phép thêm/sửa/xóa/list ra danh sách tài xế
+-Cho phép thêm/sửa/xóa/list ra các chuyến xe theo cặp tài xế - 1 xe cụ thể
+-Dùng flask
+-Dùng fastapi
+-Endpoint có dạng
+-- /fleet và /fleets/{fleet_id}
+-- /vehicles và /vehicles/{vehicle_id}
+-- /drivers và /drivers/{driver_id}
+-- /routes và /routes/{route_id}
+-Gợi ý bắt đầu:
+--Cài docker và dùng docker để chạy postgres server, tạo cái "chuồng" để cho các table trong database sinh sống
+--Tạo 1 app cơ bản (flask hoặc fastapi, nên thử flask trước)
+--Thêm router
+--Thiết kế model (các table cho database)
+--Xử lý migration để thêm các table vào database thật
+--Dùng app backend để truy xuất, thêm, sửa xóa trong database
+
+/fleet params: fleet's name
+/vehicles params: vehicle's name, fleet_id
+routes params: route's name, vehicle's name, driver's name
+
+https://testdriven.io/blog/fastapi-crud/
