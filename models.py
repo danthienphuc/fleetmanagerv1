@@ -104,7 +104,7 @@ class RouteDetail(Base,BatchModel):
         if route_id & vehicle_id:
             query = select(cls).where(cls.route_id == route_id,cls.vehicle_id == vehicle_id)
         elif route_name & vehicle_name & driver_name:
-            query = select(cls).where(cls.route_id == route_id,cls.vehicle_id == vehicle_id)
+            query = select(cls,Vehicle,Driver,Route).where(cls.route_id == Route.id,cls.vehicle_id == Vehicle.id,cls.driver_id == Driver_id)
         else:
             query = select(cls)
         results = await async_db_session.execute(query)
