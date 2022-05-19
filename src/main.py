@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from database import async_db_session
+from .database import async_db_session
 
 app = FastAPI()
 
@@ -13,9 +13,9 @@ async def startup():
 async def shutdown():
     await async_db_session.close()
 
-from services import *
+from .services import *
 
-sv = [api_fleet, api_vehicle, api_vehicle,api_driver, api_route]
+sv = [api_fleet, api_vehicle, api_vehicle,api_driver, api_route,api_routedetail]
 
-app.include_router(api_fleet)
-app.include_router(api_vehicle)
+for service in sv:
+    app.include_router(service)

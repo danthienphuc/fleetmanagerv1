@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Optional
 
 from pydantic import BaseModel
@@ -36,7 +37,7 @@ class Vehicle(VehicleBase):
 # Driver schema
 class DriverBase(BaseModel):
     name: str
-    age: str
+    age: date
 
 class DriverCreate(DriverBase):
     pass
@@ -68,8 +69,8 @@ class RouteDetailBase(BaseModel):
     route_id: int
     vehicle_id: int
     driver_id: int
-    start_date: str
-    start_time: str
+    start_date: date
+    start_time: date
 
 class RouteDetailCreate(RouteDetailBase):
     pass

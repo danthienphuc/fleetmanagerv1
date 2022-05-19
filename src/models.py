@@ -1,11 +1,9 @@
-from calendar import c
-from operator import index
 from sqlalchemy import Column, ForeignKey, Integer, String, Date,Time
 from sqlalchemy import update,delete
 from sqlalchemy.future import select
 from sqlalchemy.orm import relationship
 
-from database import Base, async_db_session
+from .database import Base, async_db_session
 
 
 class BatchModel:
@@ -16,20 +14,20 @@ class BatchModel:
         return "Create Successful"
 
     @classmethod
-    async def get(cls, id = None,name =None,*args,**kwargs):
-        if id:
-            query = select(cls).where(cls.id == id)
+    async def get(cls, id = None,*args,**kwargs):
+        query = select(cls).where(cls.id == id)
+        results = await async_db_session.execute(query)
+        return results.scalar()
+    
+    @classmethod
+    async def get_all(cls,name = None,*args,**kwargs):
+        if name is None:
+            query = select(cls)
         else:
             query = select(cls).where(cls.name == name)
         results = await async_db_session.execute(query)
-        return results.fetchall()
+        return results.scalars().all()
     
-    @classmethod
-    async def get_all(cls):
-        query = select(cls)
-        results = await async_db_session.execute(query)
-        return results.fetchall()
-
     @classmethod
     async def update(cls, id, **kwargs):
         query = (
@@ -71,6 +69,15 @@ class Vehicle(Base,BatchModel):
     name = Column(String(255), nullable=False)
     description = Column(String(255), nullable=False)
     fleet_id = Column(Integer, ForeignKey("fleets.id"), nullable=False)
+    
+    @classmethod
+    async def get_all(cls,name = None,vehicle_id = None,*args,**kwargs):
+        if name is None or vehicle_id is None:
+            query = select(cls)
+        else:
+            query = select(cls).where(cls.name == name,cls.vehicle_id == vehicle_id)
+        results = await async_db_session.execute(query)
+        return results.scalars().all()
 
 # Driver model
 class Driver(Base,BatchModel):
@@ -87,6 +94,15 @@ class Route(Base,BatchModel):
     id = Column(Integer, primary_key=True, index = True)
     name = Column(String(255), nullable=False)
     description = Column(String(255), nullable=False)
+    
+    @classmethod
+    async def get_all(cls,name = None,*args,**kwargs):
+        if name is None:
+            query = select(cls)
+        else:
+            query = select(cls).where(cls.name == name)
+        results = await async_db_session.execute(query)
+        return results.scalars().all()
 
 # Route Detail model
 class RouteDetail(Base,BatchModel):
@@ -98,21 +114,18 @@ class RouteDetail(Base,BatchModel):
     start_date = Column(Date, nullable=False)
     start_time = Column(Time, nullable=False)
     
-    
     @classmethod
-    async def get(cls, route_id,vehicle_id,route_name,vehicle_name,driver_name):
-        if route_id & vehicle_id:
-            query = select(cls).where(cls.route_id == route_id,cls.vehicle_id == vehicle_id)
-        elif route_name & vehicle_name & driver_name:
-            query = select(cls,Vehicle,Driver,Route).where(cls.route_id == Route.id,cls.vehicle_id == Vehicle.id,cls.driver_id == Driver_id)
+    async def get_all_route(cls,route_name = None,vehicle_name = None, driver_name =None,*args,**kwargs):
+        if route_name & vehicle_name & driver_name:
+            query = select(Route)
         else:
-            query = select(cls)
+            query = select([Route]).selectfrom(cls,Route,Vehicle,Driver).where(
+                cls.route_id == Route.id,
+                cls.driver_id == Driver.id,
+                cls.vehicle_id == Vehicle.id,
+                Route.name == route_name,
+                Driver.name == driver_name,
+                Vehicle.name == vehicle_name
+                )
         results = await async_db_session.execute(query)
-        return results.fetchall()
-    
-    @classmethod
-    async def get_route_detail_by(cls, route_id,vehicle_id):
-        query = select(cls).join().where(cls.route_id == route_id,cls.vehicle_id == vehicle_id)
-        results = await async_db_session.execute(query)
-        (result,) = results.one()
-        return result
+        return results.scalars().all()
