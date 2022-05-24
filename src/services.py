@@ -130,20 +130,26 @@ api_routedetail = APIRouter(prefix="/routedetails")
 
 # Create route
 @api_routedetail.post("/")
-async def create_route(data: schemas.RouteCreate):
-    return await models.Route.create(**data.dict())
+async def create_route(data: schemas.RouteDetailCreate):
+    return await models.RouteDetail.create(**data.dict())
+
+# Get route detail
+@api_routedetail.get("/{route_id}/{vehicle_id}", response_model = schemas.RouteDetail)
+async def get_route_detail(route_id:int=None, vehicle_id:int=None):
+    return await models.RouteDetail.get(route_id, vehicle_id)
+
 
 # Get all routes details
-@api_routedetail.get("/")
+@api_routedetail.get("/", response_model = List[schemas.RouteDetail])
 async def get_all_route_details():
     return await models.RouteDetail.get_all()
 
 # Update route
-@api_routedetail.put("/{id}")
-async def update_route(id:int, data: schemas.Route):
-    return await models.Route.update(id,data.dict())
+@api_routedetail.put("/{route_id}/{vehicle_id}")
+async def update_route(route_id:int,vehicle_id:int, data: schemas.RouteDetail):
+    return await models.RouteDetail.update(route_id,vehicle_id,data.dict())
 
 # Delete route
 @api_routedetail.delete("/{id}")
 async def delete_route():
-    return await models.Route.delete(id)
+    return await models.RouteDetail.delete(id)

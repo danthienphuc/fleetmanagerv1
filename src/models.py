@@ -1,3 +1,5 @@
+from ntpath import join
+from xmlrpc.client import DateTime
 from sqlalchemy import Column, ForeignKey, Integer, String, Date,Time
 from sqlalchemy import update,delete
 from sqlalchemy.future import select
@@ -11,7 +13,7 @@ class BatchModel:
     async def create(cls, **kwargs):
         async_db_session.add(cls(**kwargs))
         await async_db_session.commit()
-        return "Create Successful"
+        return "Created Successfully"
 
     @classmethod
     async def get(cls, id = None,*args,**kwargs):
@@ -29,7 +31,7 @@ class BatchModel:
         return results.scalars().all()
     
     @classmethod
-    async def update(cls, id, **kwargs):
+    async def update(cls, id,*args,**kwargs):
         query = (
             update(cls)
             .where(cls.id == id)
@@ -39,17 +41,17 @@ class BatchModel:
 
         await async_db_session.execute(query)
         await async_db_session.commit()
-        return "Update Successful!"
+        return "Updated Successfully"
 
 
     @classmethod
-    async def delete(cls, id):
+    async def delete(cls, id,*args,**kwargs):
         query = (
             delete(cls).where(cls.id == id)
         )
         await async_db_session.excute(query)
         await async_db_session.commit()
-        return "Delete Successful"
+        return "Deleted Successfully"
 
 
 # Fleet model
@@ -72,10 +74,12 @@ class Vehicle(Base,BatchModel):
     
     @classmethod
     async def get_all(cls,name = None,vehicle_id = None,*args,**kwargs):
-        if name is None or vehicle_id is None:
-            query = select(cls)
-        else:
-            query = select(cls).where(cls.name == name,cls.vehicle_id == vehicle_id)
+        query = select(cls)
+        if name is not None:
+            query.filter(cls.name == name)
+        if vehicle_id is not None:
+            query.filter(cls.id == vehicle_id)
+
         results = await async_db_session.execute(query)
         return results.scalars().all()
 
@@ -97,10 +101,9 @@ class Route(Base,BatchModel):
     
     @classmethod
     async def get_all(cls,name = None,*args,**kwargs):
-        if name is None:
-            query = select(cls)
-        else:
-            query = select(cls).where(cls.name == name)
+        query = select(cls)
+        if name is not None:
+            query.filter(cls.name == name)
         results = await async_db_session.execute(query)
         return results.scalars().all()
 
@@ -111,21 +114,54 @@ class RouteDetail(Base,BatchModel):
     route_id = Column(Integer, ForeignKey("routes.id"), primary_key=True, index = True)
     vehicle_id = Column(Integer, ForeignKey("vehicles.id"), primary_key=True, index = True)
     driver_id = Column(Integer, ForeignKey("drivers.id"), index = True)
-    start_date = Column(Date, nullable=False)
-    start_time = Column(Time, nullable=False)
+    start_time = Column(Date)
+    end_time = Column(Date)
+    start_location = Column(String(255), nullable=False)
+    end_location = Column(String(255), nullable=False)
+    ticket_price = Column(Integer, nullable=False)
+
+    @classmethod
+    async def get(cls,route_id,vehicle_id,*args,**kwargs):
+        query = select(cls).where(cls.route_id == route_id).where(cls.vehicle_id == vehicle_id)
+        results = await async_db_session.execute(query)
+        return results.scalar()
     
     @classmethod
     async def get_all_route(cls,route_name = None,vehicle_name = None, driver_name =None,*args,**kwargs):
-        if route_name & vehicle_name & driver_name:
-            query = select(Route)
-        else:
-            query = select([Route]).selectfrom(cls,Route,Vehicle,Driver).where(
-                cls.route_id == Route.id,
-                cls.driver_id == Driver.id,
-                cls.vehicle_id == Vehicle.id,
-                Route.name == route_name,
-                Driver.name == driver_name,
-                Vehicle.name == vehicle_name
-                )
+        query = select(Route).\
+            select_from(RouteDetail.join(Route).join(Vehicle).join(Driver)).\
+            where(
+            Route.name == route_name,
+            Vehicle.name == vehicle_name,
+            Driver.name == driver_name)
+        if(route_name):
+            query.filter(Route.name == route_name)
+        if(vehicle_name):
+            query.filter(Vehicle.name == vehicle_name)
+        if(driver_name):
+            query.filter(Driver.name == driver_name)
+        
         results = await async_db_session.execute(query)
         return results.scalars().all()
+    
+    @classmethod
+    async def update(cls, route_id,vehicle_id,*args,**kwargs):
+        query = (
+            update(cls)
+            .where(cls.route_id == route_id, cls.vehicle_id == vehicle_id)
+            .values(**kwargs)
+            .execution_options(synchronize_session="fetch")
+        )
+
+        await async_db_session.execute(query)
+        await async_db_session.commit()
+        return "Updated Successfully"
+
+    @classmethod
+    async def delete(cls, route_id,vehicle_id,*args,**kwargs):
+        query = (
+            delete(cls).where(cls.route_id == route_id, cls.vehicle_id == vehicle_id)
+        )
+        await async_db_session.excute(query)
+        await async_db_session.commit()
+        return "Deleted Successfully"

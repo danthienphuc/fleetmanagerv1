@@ -1,7 +1,9 @@
+import py
 import pytest
+
 from httpx import AsyncClient
 
-from ..main import app
+from ..src.main import app
 
 @pytest.fixture
 async def Client():
@@ -10,227 +12,274 @@ async def Client():
 
 
 # Fleet tests
+################################################################################
+@pytest.mark.parametrize("name,description", [
+    ("Test Fleet 1", "Test Fleet Description 1"),
+    ("Test Fleet 2", "Test Fleet Description 2"),
+    ("Test Fleet 3", "Test Fleet Description 3")])
 @pytest.mark.asyncio
-async def test_create_fleet(Client):
+async def test_create_fleet(Client, name, description):
     response = await Client.post(
         "/fleets/",
         json={
-            "name": "Test Fleet",
-            "description": "Test fleet creation",
+            "name": name,
+            "description": description,
         },
     )
     assert response.status_code == 200, response.text
-    assert response.json()["name"] == "Test Fleet"
+    assert response.json()["detail"] == "Created Successfully" 
 
+@pytest.mark.parametrize("id,name,description", [
+    ("1", "Test Fleet 1", "Test Fleet Description 1"),
+    ("2", "Test Fleet 2", "Test Fleet Description 2"),
+    ("3", "Test Fleet 3", "Test Fleet Description 3")])
 @pytest.mark.asyncio
-async def test_get_fleet(Client):
-    response = await Client.get("/fleets/1")
+async def test_get_fleet(Client, id, name, description):
+    response = await Client.get("/fleets/" + id)
     assert response.status_code == 200, response.text
-    assert response.json()["name"] == "Test Fleet"
-    assert response.json()["description"] == "Test fleet creation"
+    assert response.json()["name"] == name
+    assert response.json()["description"] == description
 
 @pytest.mark.asyncio
 async def test_get_fleets(Client):
     response = await Client.get("/fleets/")
     assert response.status_code == 200, response.text
-    assert len(response.json()) == 1
-    assert response.json()[0]["name"] == "Test Fleet"
-    assert response.json()[0]["description"] == "Test fleet creation"
+    assert len(response.json()) == 3
+    for i in range(3):
+        assert response.json()[i]["id"] == str(i + 1)
+        assert response.json()[i]["name"] == "Test Fleet " + str(i + 1)
+        assert response.json()[i]["description"] == "Test Fleet Description " + str(i + 1)
+
+
+@pytest.mark.parametrize("id,name,description", [
+    ("1", "Test Fleet 1", "Test Fleet Description 1 Updated"),
+    ("2", "Test Fleet 2", "Test Fleet Description 2 Updated"),
+    ("3", "Test Fleet 3", "Test Fleet Description 3 Updated")])
 
 @pytest.mark.asyncio
-async def test_update_fleet(Client):
+async def test_update_fleet(Client ,id, name, description):
     response = await Client.put(
-        "/fleets/1",
+        "/fleets/" + id,
         json={
-            "name": "Test Fleet",
-            "description": "Test fleet update",
+            "name": name,
+            "description": description,
         },
     )
     assert response.status_code == 200, response.text
-    assert response.json()["name"] == "Test Fleet"
-    assert response.json()["description"] == "Test fleet update"
-
-@pytest.mark.asyncio
-async def test_delete_fleet(Client):
-    response = await Client.delete("/fleets/1")
-    assert response.status_code == 204, response.text
+    assert response.json()["detail"] == "Updated successfully"
 
 
 # Vehicle tests
+################################################################################
+
+@pytest.mark.parametrize("name,description,fleet_id", [
+    ("Test Vehicle 1", "Test Vehicle Description 1", "1"),
+    ("Test Vehicle 2", "Test Vehicle Description 2", "2"),
+    ("Test Vehicle 3", "Test Vehicle Description 3", "1")])
 @pytest.mark.asyncio
-async def test_create_vehicle(Client):
+async def test_create_vehicle(Client, name, description, fleet_id):
     response = await Client.post(
         "/vehicles/",
         json={
-            "name": "Test Vehicle",
-            "description": "Test vehicle creation",
-            "fleet": 1,
+            "name": name,
+            "description": description,
+            "fleet_id": fleet_id,
         },
     )
     assert response.status_code == 200, response.text
-    assert response.json()["name"] == "Test Vehicle"
-    assert response.json()["description"] == "Test vehicle creation"
-    assert response.json()["fleet"] == 1
+    assert response.json()["detail"] == "Created Successfully"
 
+@pytest.mark.parametrize("id,name,description,fleet_id", [
+    ("1", "Test Vehicle 1", "Test Vehicle Description 1", "1"),
+    ("2", "Test Vehicle 2", "Test Vehicle Description 2", "2"),
+    ("3", "Test Vehicle 3", "Test Vehicle Description 3", "1")])
 @pytest.mark.asyncio
-async def test_get_vehicle(Client):
-    response = await Client.get("/vehicles/1")
+async def test_get_vehicle(Client, id, name, description, fleet_id):
+    response = await Client.get("/vehicles/" + id)
     assert response.status_code == 200, response.text
-    assert response.json()["name"] == "Test Vehicle"
-    assert response.json()["description"] == "Test vehicle creation"
-    assert response.json()["fleet"] == 1
+    assert response.json()["id"] == id
+    assert response.json()["name"] == name
+    assert response.json()["description"] == description
+    assert response.json()["fleet_id"] == fleet_id
+
 
 @pytest.mark.asyncio
 async def test_get_vehicles(Client):
     response = await Client.get("/vehicles/")
     assert response.status_code == 200, response.text
-    assert len(response.json()) == 1
-    assert response.json()[0]["name"] == "Test Vehicle"
-    assert response.json()[0]["description"] == "Test vehicle creation"
-    assert response.json()[0]["fleet"] == 1
+    assert len(response.json()) == 3
+    for i in range(3):
+        assert response.json()[i]["id"] == str(i + 1)
+        assert response.json()[i]["name"] == "Test Vehicle " + str(i + 1)
+        assert response.json()[i]["description"] == "Test Vehicle Description " + str(i + 1)
+        assert response.json()[i]["fleet_id"] == ((i+1)%2)*(-1)+2
 
+@pytest.mark.parametrize("id,name,description,fleet_id", [
+    ("1", "Test Vehicle 1", "Test Vehicle Description 1 Updated", "1"),
+    ("2", "Test Vehicle 2", "Test Vehicle Description 2 Updated", "2"),
+    ("3", "Test Vehicle 3", "Test Vehicle Description 3 Updated", "1")])
 @pytest.mark.asyncio
-async def test_update_vehicle(Client):
+async def test_update_vehicle(Client, id, name, description, fleet_id):
     response = await Client.put(
-        "/vehicles/1",
+        "/vehicles/"+id,
         json={
-            "name": "Test Vehicle",
-            "description": "Test vehicle update",
-            "fleet": 1,
+            "name": name,
+            "description": description,
+            "fleet_id": fleet_id,
         },
     )
     assert response.status_code == 200, response.text
-    assert response.json()["name"] == "Test Vehicle"
-    assert response.json()["description"] == "Test vehicle update"
-    assert response.json()["fleet"] == 1
-
-@pytest.mark.asyncio
-async def test_delete_vehicle(Client):
-    response = await Client.delete("/vehicles/1")
-    assert response.status_code == 204, response.text
+    assert response.json()["detail"] == "Updated successfully"
 
 
 # Driver tests
+################################################################################
+
+@pytest.mark.parametrize("name,description,age", [
+    ("Test Driver 1", "Test Driver Description 1", "1988-05-13"),
+    ("Test Driver 2", "Test Driver Description 2", "1984-03-09"),
+    ("Test Driver 3", "Test Driver Description 3", "1987-06-09")])
 @pytest.mark.asyncio
-async def test_create_driver(Client):
+async def test_create_driver(Client, name, description, age):
     response = await Client.post(
         "/drivers/",
         json={
-            "name": "Test Driver",
-            "description": "Test driver creation",
-            "age": "1988-08-25",
+            "name": name,
+            "description": description,
+            "age": age,
         },
     )
     assert response.status_code == 200, response.text
-    assert response.json()["name"] == "Test Driver"
-    assert response.json()["description"] == "Test driver creation"
-    assert response.json()["age"] == "1988-08-25"
+    assert response.json()["detail"] == "Created Successfully"
 
+@pytest.mark.parametrize("id,name,description,age", [
+    ("1", "Test Driver 1", "Test Driver Description 1", "1988-05-13"),
+    ("2", "Test Driver 2", "Test Driver Description 2", "1984-03-09"),
+    ("3", "Test Driver 3", "Test Driver Description 3", "1987-06-09")])
 @pytest.mark.asyncio
-async def test_get_driver(Client):
-    response = await Client.get("/drivers/1")
+async def test_get_driver(Client, id, name, description, age):
+    response = await Client.get("/drivers/" + id)
     assert response.status_code == 200, response.text
-    assert response.json()["name"] == "Test Driver"
-    assert response.json()["description"] == "Test driver creation"
-    assert response.json()["age"] == "1988-08-25"
+    assert response.json()["id"] == id
+    assert response.json()["name"] == name
+    assert response.json()["description"] == description
+    assert response.json()["age"] == age
 
 @pytest.mark.asyncio
 async def test_get_drivers(Client):
     response = await Client.get("/drivers/")
     assert response.status_code == 200, response.text
-    assert len(response.json()) == 1
-    assert response.json()[0]["name"] == "Test Driver"
-    assert response.json()[0]["description"] == "Test driver creation"
-    assert response.json()[0]["age"] == "1988-08-25"
+    assert len(response.json()) == 3
+    for i in range(3):
+        assert response.json()[i]["id"] == str(i + 1)
+        assert response.json()[i]["name"] == "Test Driver " + str(i + 1)
+        assert response.json()[i]["description"] == "Test Driver Description " + str(i + 1)
+        assert response.json()[i]["age"] in ["1988-05-13", "1984-03-09", "1987-06-09"]
 
+@pytest.mark.parametrize("id,name,description,age", [
+    ("1", "Test Driver 1", "Test Driver Description 1 Updated", "1988-05-13"),
+    ("2", "Test Driver 2", "Test Driver Description 2 Updated", "1984-03-09"),
+    ("3", "Test Driver 3", "Test Driver Description 3 Updated", "1987-06-09")])
 @pytest.mark.asyncio
-async def test_update_driver(Client):
+async def test_update_driver(Client, id, name, description, age):
     response = await Client.put(
-        "/drivers/1",
+        "/drivers/" + id,
         json={
-            "name": "Test Driver",
-            "description": "Test driver update",
-            "age": "1988-08-25",
+            "name": name,
+            "description": description,
+            "age": age,
         },
     )
     assert response.status_code == 200, response.text
-    assert response.json()["name"] == "Test Driver"
-    assert response.json()["description"] == "Test driver update"
-    assert response.json()["age"] == "1988-08-25"
-
-@pytest.mark.asyncio
-async def test_delete_driver(Client):
-    response = await Client.delete("/drivers/1")
-    assert response.status_code == 204, response.text
+    assert response.json()["detail"] == "Updated Successfully"
 
 # Route tests
+################################################################################
+
+@pytest.mark.parametrize("name,description", [
+    ("Test Route 1", "Test Route Description 1"),
+    ("Test Route 2", "Test Route Description 2"),
+    ("Test Route 3", "Test Route Description 3")])
 @pytest.mark.asyncio
-async def test_create_route(Client):
+async def test_create_route(Client, name, description):
     response = await Client.post(
         "/routes/",
         json={
-            "name": "Test Route",
-            "description": "Test route creation"
+            "name": name,
+            "description": description,
         },
     )
     assert response.status_code == 200, response.text
-    assert response.json()["name"] == "Test Route"
-    assert response.json()["description"] == "Test route creation"
+    assert response.json()["detail"] == "Created Successfully"
 
+@pytest.mark.parametrize("id,name,description", [
+    ("1", "Test Route 1", "Test Route Description 1"),
+    ("2", "Test Route 2", "Test Route Description 2"),
+    ("3", "Test Route 3", "Test Route Description 3")])
 @pytest.mark.asyncio
-async def test_get_route(Client):
-    response = await Client.get("/routes/1")
+async def test_get_route(Client, id, name, description):
+    response = await Client.get("/routes/" + id)
     assert response.status_code == 200, response.text
-    assert response.json()["name"] == "Test Route"
-    assert response.json()["description"] == "Test route creation"
+    assert response.json()["id"] == id
+    assert response.json()["name"] == name
+    assert response.json()["description"] == description
 
 @pytest.mark.asyncio
 async def test_get_routes(Client):
     response = await Client.get("/routes/")
     assert response.status_code == 200, response.text
-    assert len(response.json()) == 1
-    assert response.json()[0]["name"] == "Test Route"
-    assert response.json()[0]["description"] == "Test route creation"
+    assert len(response.json()) == 3
+    for i in range(3):
+        assert response.json()[i]["id"] == str(i + 1)
+        assert response.json()[i]["name"] == "Test Route " + str(i + 1)
+        assert response.json()[i]["description"] == "Test Route Description " + str(i + 1)
 
+@pytest.mark.parametrize("id,name,description", [
+    ("1", "Test Route 1", "Test Route Description 1 Updated"),
+    ("2", "Test Route 2", "Test Route Description 2 Updated"),
+    ("3", "Test Route 3", "Test Route Description 3 Updated")])
 @pytest.mark.asyncio
-async def test_update_route(Client):
+async def test_update_route(Client, id, name, description):
     response = await Client.put(
-        "/routes/1",
+        "/routes/"+id,
         json={
-            "name": "Test Route",
-            "description": "Test route update"
+            "name": name,
+            "description": description,
         },
     )
     assert response.status_code == 200, response.text
-    assert response.json()["name"] == "Test Route"
-    assert response.json()["description"] == "Test route update"
-
-@pytest.mark.asyncio
-async def test_delete_route(Client):
-    response = await Client.delete("/routes/1")
-    assert response.status_code == 204, response.text
+    assert response.json()["detail"] == "Updated Successfully"
 
 # Route Details tests
+################################################################################
 
+@pytest.mark.parametrize("route_id,driver_id,vehicle_id,start_time,end_time,start_location,end_location,ticket_price", [
+    ("1", "1", "1", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 1", "Test End Location 1", "10.00"),
+    ("2", "2", "2", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 2", "Test End Location 2", "20.00"),
+    ("3", "3", "3", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 3", "Test End Location 3", "30.00"),
+    ("1", "2", "2", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 4", "Test End Location 4", "40.00"),
+    ("2", "3", "3", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 5", "Test End Location 5", "50.00"),
+    ("3", "1", "1", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 6", "Test End Location 6", "60.00"),
+    ("1", "3", "3", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 7", "Test End Location 7", "70.00"),
+    ("2", "1", "1", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 8", "Test End Location 8", "80.00"),
+    ("3", "2", "2", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 9", "Test End Location 9", "90.00")])
 @pytest.mark.asyncio
-async def test_create_route_details(Client):
+async def test_create_route_details(Client, route_id, vehicle_id,  driver_id,start_time, end_time, start_location, end_location, ticket_price):
     response = await Client.post(
         "/routes/1/details/",
         json={
-            "name": "Test Route Detail",
-            "description": "Test route detail creation"
+            "route_id": route_id,
+            "vehicle_id": vehicle_id,
+            "driver_id": driver_id,
+            "start_time": start_time,
+            "end_time": end_time,
+            "start_location": start_location,
+            "end_location": end_location,
+            "ticket_price": ticket_price
         },
     )
     assert response.status_code == 200, response.text
-    assert response.json()["name"] == "Test Route Detail"
-    assert response.json()["description"] == "Test route detail creation"
-
-@pytest.mark.asyncio
-async def test_get_route_details(Client):
-    response = await Client.get("/routedetails/1")
-    assert response.status_code == 200, response.text
-    assert response.json()["name"] == "Test Route Detail"
-    assert response.json()["description"] == "Test route detail creation"
+    assert response.json()["detail"] == "Created Successfully"
 
 @pytest.mark.asyncio
 async def test_get_route_details_list(Client):
@@ -240,8 +289,18 @@ async def test_get_route_details_list(Client):
     assert response.json()[0]["name"] == "Test Route Detail"
     assert response.json()[0]["description"] == "Test route detail creation"
 
+@pytest.mark.parametrize("route_id,vehicle_id,driver_id,start_time,end_time,start_location,end_location,ticket_price", [
+    ("1", "1", "1", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 1 Updated", "Test End Location Updated", "10.00"),
+    ("2", "2", "2", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 2 Updated", "Test End Location Updated", "20.00"),
+    ("3", "3", "3", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 3 Updated", "Test End Location Updated", "30.00"),
+    ("1", "2", "2", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 4 Updated", "Test End Location Updated", "40.00"),
+    ("2", "3", "3", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 5 Updated", "Test End Location Updated", "50.00"),
+    ("3", "1", "1", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 6 Updated", "Test End Location Updated", "60.00"),
+    ("1", "3", "3", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 7 Updated", "Test End Location Updated", "70.00"),
+    ("2", "1", "1", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 8 Updated", "Test End Location Updated", "80.00"),
+    ("3", "2", "2", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 9 Updated", "Test End Location Updated", "90.00")])
 @pytest.mark.asyncio
-async def test_update_route_details(Client):
+async def test_update_route_details(Client, route_id, vehicle_id,  driver_id,start_time, end_time, start_location, end_location, ticket_price):
     response = await Client.put(
         "/routedetails/1",
         json={
@@ -250,13 +309,54 @@ async def test_update_route_details(Client):
         },
     )
     assert response.status_code == 200, response.text
-    assert response.json()["name"] == "Test Route Detail"
-    assert response.json()["description"] == "Test route detail update"
+    assert response.json()["detail"] == "Updated Successfully"
+
+
+
+
+# Delete tests
+################################################################################
+
+@pytest.mark.parametrize("route_id,vehicle_id", [
+    ("1", "1"),
+    ("2", "2"),
+    ("3", "3"),
+    ("1", "2"),
+    ("2", "3"),
+    ("3", "1"),
+    ("1", "3"),
+    ("2", "1"),
+    ("3", "2")])
 
 @pytest.mark.asyncio
-async def test_delete_route_details(Client):
-    response = await Client.delete("/routedetails/1")
+async def test_delete_route_details(Client, route_id, vehicle_id):
+    response = await Client.delete("/routedetails/"+route_id+"/"+vehicle_id)
     assert response.status_code == 204, response.text
 
+@pytest.mark.parametrize("id", ["1", "2", "3"])
+@pytest.mark.asyncio
+async def test_delete_route(Client, id):
+    response = await Client.delete("/routes/"+id)
+    assert response.status_code == 204, response.text
+    assert response.json()["detail"] == "Deleted successfully"
 
+@pytest.mark.parametrize("id", ["1", "2", "3"])
+@pytest.mark.asyncio
+async def test_delete_driver(Client, id):
+    response = await Client.delete("/drivers/"+id)
+    assert response.status_code == 204, response.text
+    assert response.json()["detail"] == "Deleted successfully"
 
+@pytest.mark.parametrize("id", ["1", "2", "3"])
+@pytest.mark.asyncio
+async def test_delete_vehicle(Client, id):
+    response = await Client.delete("/vehicles/"+id)
+    assert response.status_code == 204, response.text
+    assert response.json()["detail"] == "Deleted successfully"
+
+@pytest.mark.parametrize("id", ["1", "2", "3"])
+@pytest.mark.asyncio
+async def test_delete_fleet(Client, id):
+    response = await Client.delete("/fleets/" + id)
+    assert response.status_code == 204, response.text
+    assert response.json()["detail"] == "Deleted successfully"

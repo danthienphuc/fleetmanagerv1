@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import date, datetime
+from re import S
 from typing import Optional
 
 from pydantic import BaseModel
@@ -69,8 +70,12 @@ class RouteDetailBase(BaseModel):
     route_id: int
     vehicle_id: int
     driver_id: int
-    start_date: date
-    start_time: date
+    start_time: Optional[date] = None
+    end_time: Optional[date] = None
+    start_location: str
+    end_location: str
+    ticket_price: int
+
 
 class RouteDetailCreate(RouteDetailBase):
     pass
