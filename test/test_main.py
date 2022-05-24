@@ -1,14 +1,7 @@
 import pytest
-
 from httpx import AsyncClient
 
 from ..src.main import app
-
-@pytest.fixture
-async def Client():
-    async with AsyncClient(app=app, base_url='http://127.0.0.1:8000') as client:
-        yield client
-
 
 # Fleet tests
 ################################################################################
@@ -34,7 +27,8 @@ async def test_create_fleet(Client, name, description):
     ("3", "Test Fleet 3", "Test Fleet Description 3")])
 @pytest.mark.asyncio
 async def test_get_fleet(Client, id, name, description):
-    response = await Client.get("/fleets/" + id)
+    async with AsyncClient(app=app, base_url='http://127.0.0.1:8000') as Client:
+        response = await Client.get("/fleets/" + id)
     assert response.status_code == 200, response.text
     assert response.json()["name"] == name
     assert response.json()["description"] == description

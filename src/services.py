@@ -10,7 +10,7 @@ from . import schemas, models
 
 # Fleet endpoint
 # -------------------------------------------------------------------------------------------------------------
-api_fleet = APIRouter(prefix="/fleets")
+api_fleet = APIRouter(prefix="/fleets",tags=["Fleet"])
 
 # Create fleet
 @api_fleet.post("/")
@@ -29,7 +29,7 @@ async def get_fleets(name: str =None):
 
 # Update fleet
 @api_fleet.put("/{id}")
-async def update_fleet(id: int, data: schemas.Fleet):
+async def update_fleet(id: int, data: schemas.FleetBase):
     return await models.Fleet.update(id, **data.dict())
 
 # Delete fleet
@@ -39,7 +39,7 @@ async def delete_fleet(id: int):
 
 # Vehicle endpoint
 # -------------------------------------------------------------------------------------------------------------
-api_vehicle = APIRouter(prefix="/vehicles")
+api_vehicle = APIRouter(prefix="/vehicles",tags=["Vehicle"])
 
 # Create vehicle
 @api_vehicle.post("/")
@@ -53,12 +53,12 @@ async def get_vehicle(id: int = None):
 
 # Get all vehicles
 @api_vehicle.get("/", response_model=List[schemas.Vehicle])
-async def get_vehicles(name: str= None,vehicle_id: int = None):
+async def get_vehicles(name: str = None,vehicle_id: int = None):
     return await models.Vehicle.get_all(name, vehicle_id)
 
 # Update vehicle
 @api_vehicle.put("/{id}")
-async def update_vehicle(data: schemas.Vehicle):
+async def update_vehicle(data: schemas.VehicleBase):
     return await models.Vehicle.update(id,data.dict())
 
 # Delete vehicle
@@ -68,7 +68,7 @@ async def delete_vehicles(id: int):
 
 # Driver endpoint
 # -------------------------------------------------------------------------------------------------------------
-api_driver = APIRouter(prefix="/drivers")      
+api_driver = APIRouter(prefix="/drivers",tags=["Driver"])      
                           
 @api_driver.post("/")
 async def create_driver(data: schemas.DriverCreate):
@@ -86,7 +86,7 @@ async def get_drivers(name: str= None):
 
 # Update driver
 @api_driver.put("/{id}")
-async def update_driver(id:int, data: schemas.Driver):
+async def update_driver(id:int, data: schemas.DriverBase):
     return await models.Driver.update(id,data.dict())
 
 # Delete driver
@@ -96,7 +96,7 @@ async def delete_driver(id: int):
 
 # Route endpoint
 # -------------------------------------------------------------------------------------------------------------
-api_route = APIRouter(prefix="/routes")
+api_route = APIRouter(prefix="/routes",tags=["Route"])
 
 # Create route
 @api_route.post("/")
@@ -115,7 +115,7 @@ async def get_all_routes(route_name: str= None, vehicle_name: str= None,driver_n
 
 # Update route
 @api_route.put("/{id}")
-async def update_route(id:int, data: schemas.Route):
+async def update_route(id:int, data: schemas.RouteBase):
     return await models.Route.update(id,data.dict())
 
 # Delete route
@@ -126,7 +126,7 @@ async def delete_route():
 
 # RouteDetail endpoint
 # -------------------------------------------------------------------------------------------------------------
-api_routedetail = APIRouter(prefix="/routedetails")
+api_routedetail = APIRouter(prefix="/routedetails",tags=["Route Detail"])
 
 # Create route
 @api_routedetail.post("/")
@@ -146,7 +146,7 @@ async def get_all_route_details():
 
 # Update route
 @api_routedetail.put("/{route_id}/{vehicle_id}")
-async def update_route(route_id:int,vehicle_id:int, data: schemas.RouteDetail):
+async def update_route(route_id:int,vehicle_id:int, data: schemas.RouteDetailBase):
     return await models.RouteDetail.update(route_id,vehicle_id,data.dict())
 
 # Delete route

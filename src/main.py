@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+
+from src.models import Vehicle
 from .database import async_db_session
 
 app = FastAPI()
@@ -15,7 +17,7 @@ async def shutdown():
 
 from .services import *
 
-sv = [api_fleet, api_vehicle, api_vehicle,api_driver, api_route,api_routedetail]
+sv = [api_fleet, api_vehicle, api_driver, api_route, api_routedetail]
 
 for service in sv:
     app.include_router(service)

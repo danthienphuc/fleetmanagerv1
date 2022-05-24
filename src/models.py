@@ -1,6 +1,4 @@
-from ntpath import join
-from xmlrpc.client import DateTime
-from sqlalchemy import Column, ForeignKey, Integer, String, Date,Time
+from sqlalchemy import Column, ForeignKey, Integer, String, Date, join
 from sqlalchemy import update,delete
 from sqlalchemy.future import select
 from sqlalchemy.orm import relationship
@@ -23,6 +21,7 @@ class BatchModel:
     
     @classmethod
     async def get_all(cls,name = None,*args,**kwargs):
+        print(name)
         if name is None:
             query = select(cls)
         else:
@@ -75,11 +74,10 @@ class Vehicle(Base,BatchModel):
     @classmethod
     async def get_all(cls,name = None,vehicle_id = None,*args,**kwargs):
         query = select(cls)
-        if name is not None:
+        if name:
             query.filter(cls.name == name)
-        if vehicle_id is not None:
+        if vehicle_id:
             query.filter(cls.id == vehicle_id)
-
         results = await async_db_session.execute(query)
         return results.scalars().all()
 
@@ -128,12 +126,11 @@ class RouteDetail(Base,BatchModel):
     
     @classmethod
     async def get_all_route(cls,route_name = None,vehicle_name = None, driver_name =None,*args,**kwargs):
+        
         query = select(Route).\
-            select_from(RouteDetail.join(Route).join(Vehicle).join(Driver)).\
-            where(
-            Route.name == route_name,
-            Vehicle.name == vehicle_name,
-            Driver.name == driver_name)
+            select_from(join(cls, Route,cls.route_id==Route.id).\
+                join(Vehicle,cls.vehicle_id==Vehicle.id).\
+                    join(Driver,cls.driver_id == Driver.id))
         if(route_name):
             query.filter(Route.name == route_name)
         if(vehicle_name):
