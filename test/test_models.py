@@ -32,8 +32,8 @@ async def test_create_fleet(Client, name, description):
     response = await Client.post(
         "/fleets/",
         json={
-            "name": name,
-            "description": description,
+            'name': name,
+            'description': description,
         }
     )
     assert response.status_code == 200, response.text

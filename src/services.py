@@ -142,13 +142,13 @@ async def get_route_detail(route_id:int=None, vehicle_id:int=None):
 
 
 # Get all routes details
-@api_routedetail.get("/", response_model = List[schemas.RouteDetailBase])
+@api_routedetail.get("/",response_model = List[schemas.RouteDetail])
 async def get_all_route_details():
     return await models.RouteDetail.get_all()
 
 # Update route
 @api_routedetail.put("/{route_id}/{vehicle_id}")
-async def update_route(route_id:int,vehicle_id:int, data: schemas.RouteDetailBase):
+async def update_route(route_id:int,vehicle_id:int, data: schemas.RouteDetail):
     return await models.RouteDetail.update(route_id,vehicle_id,**data.dict())
 
 # Delete route

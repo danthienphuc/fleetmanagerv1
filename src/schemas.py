@@ -65,10 +65,7 @@ class Route(RouteBase):
         orm_mode = True
 
 # Route Detail schema
-
 class RouteDetailBase(BaseModel):
-    route_id: int
-    vehicle_id: int
     driver_id: int
     start_time: Optional[date] = None
     end_time: Optional[date] = None
@@ -78,7 +75,11 @@ class RouteDetailBase(BaseModel):
 
 
 class RouteDetailCreate(RouteDetailBase):
+    route_id: int
+    vehicle_id: int
+
+class RouteDetail(RouteDetailCreate):
     pass
 
-class RouteDetail(RouteDetailBase):
-    pass
+    class Config:
+        orm_mode = True
