@@ -58,8 +58,8 @@ async def get_vehicles(name: str = None,vehicle_id: int = None):
 
 # Update vehicle
 @api_vehicle.put("/{id}")
-async def update_vehicle(data: schemas.VehicleBase):
-    return await models.Vehicle.update(id,data.dict())
+async def update_vehicle(id:int,data: schemas.VehicleBase):
+    return await models.Vehicle.update(id, **data.dict())
 
 # Delete vehicle
 @api_vehicle.delete("/")
@@ -87,7 +87,7 @@ async def get_drivers(name: str= None):
 # Update driver
 @api_driver.put("/{id}")
 async def update_driver(id:int, data: schemas.DriverBase):
-    return await models.Driver.update(id,data.dict())
+    return await models.Driver.update(id,**data.dict())
 
 # Delete driver
 @api_driver.delete("/{id}")
@@ -116,7 +116,7 @@ async def get_all_routes(route_name: str= None, vehicle_name: str= None,driver_n
 # Update route
 @api_route.put("/{id}")
 async def update_route(id:int, data: schemas.RouteBase):
-    return await models.Route.update(id,data.dict())
+    return await models.Route.update(id,**data.dict())
 
 # Delete route
 @api_route.delete("/{id}")
@@ -147,9 +147,9 @@ async def get_all_route_details():
 # Update route
 @api_routedetail.put("/{route_id}/{vehicle_id}")
 async def update_route(route_id:int,vehicle_id:int, data: schemas.RouteDetailBase):
-    return await models.RouteDetail.update(route_id,vehicle_id,data.dict())
+    return await models.RouteDetail.update(route_id,vehicle_id,**data.dict())
 
 # Delete route
-@api_routedetail.delete("/{id}")
-async def delete_route():
-    return await models.RouteDetail.delete(id)
+@api_routedetail.delete("/{route_id}/{vehicle_id}")
+async def delete_route(route_id: int, vehicle_id: int):
+    return await models.RouteDetail.delete(route_id,vehicle_id)

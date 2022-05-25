@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Date, join
+from sqlalchemy import Column, ForeignKey, Integer, String, Date, join, null
 from sqlalchemy import update,delete
 from sqlalchemy.future import select
 from sqlalchemy.orm import relationship
@@ -21,11 +21,10 @@ class BatchModel:
     
     @classmethod
     async def get_all(cls,name = None,*args,**kwargs):
-        print(name)
         if name is None:
             query = select(cls)
         else:
-            query = select(cls).where(cls.name == name)
+            query = select(cls).where(cls.name.like("%"+name+"%"))
         results = await async_db_session.execute(query)
         return results.scalars().all()
     
@@ -48,7 +47,7 @@ class BatchModel:
         query = (
             delete(cls).where(cls.id == id)
         )
-        await async_db_session.excute(query)
+        await async_db_session.execute(query)
         await async_db_session.commit()
         return "Deleted Successfully"
 
@@ -72,12 +71,12 @@ class Vehicle(Base,BatchModel):
     fleet_id = Column(Integer, ForeignKey("fleets.id"), nullable=False)
     
     @classmethod
-    async def get_all(cls,name = None,vehicle_id = None,*args,**kwargs):
+    async def get_all(cls,name = None,fleet_id = None,*args,**kwargs):
         query = select(cls)
         if name:
-            query.filter(cls.name == name)
-        if vehicle_id:
-            query.filter(cls.id == vehicle_id)
+            query = query.filter(cls.name.like("%"+name+"%"))
+        if fleet_id:
+            query = query.filter(cls.fleet_id == fleet_id)
         results = await async_db_session.execute(query)
         return results.scalars().all()
 
@@ -97,13 +96,6 @@ class Route(Base,BatchModel):
     name = Column(String(255), nullable=False)
     description = Column(String(255), nullable=False)
     
-    @classmethod
-    async def get_all(cls,name = None,*args,**kwargs):
-        query = select(cls)
-        if name is not None:
-            query.filter(cls.name == name)
-        results = await async_db_session.execute(query)
-        return results.scalars().all()
 
 # Route Detail model
 class RouteDetail(Base,BatchModel):
@@ -132,11 +124,11 @@ class RouteDetail(Base,BatchModel):
                 join(Vehicle,cls.vehicle_id==Vehicle.id).\
                     join(Driver,cls.driver_id == Driver.id))
         if(route_name):
-            query.filter(Route.name == route_name)
+            query = query.filter(Route.name.like(route_name))
         if(vehicle_name):
-            query.filter(Vehicle.name == vehicle_name)
+            query = query.filter(Vehicle.name.like(vehicle_name))
         if(driver_name):
-            query.filter(Driver.name == driver_name)
+            query = query.filter(Driver.name.like(driver_name))
         
         results = await async_db_session.execute(query)
         return results.scalars().all()
@@ -159,6 +151,6 @@ class RouteDetail(Base,BatchModel):
         query = (
             delete(cls).where(cls.route_id == route_id, cls.vehicle_id == vehicle_id)
         )
-        await async_db_session.excute(query)
+        await async_db_session.execute(query)
         await async_db_session.commit()
         return "Deleted Successfully"

@@ -1,6 +1,4 @@
 from fastapi import FastAPI
-
-from src.models import Vehicle
 from .database import async_db_session
 
 app = FastAPI()

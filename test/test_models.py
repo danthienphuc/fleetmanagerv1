@@ -9,6 +9,17 @@ async def Client():
     async with AsyncClient(app=app, base_url='http://127.0.0.1:8000') as client:
         yield client
 
+@pytest.mark.parametrize("a,b,expected", [
+    (1, 1, 2),
+    (1, 2, 3),
+    (2, 2, 4),
+    (2, 3, 5)])
+@pytest.mark.asyncio
+async def test_add(Client,a, b, expected):
+
+    assert a + b == expected
+
+
 
 # Fleet tests
 ################################################################################
