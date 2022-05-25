@@ -111,10 +111,10 @@ class RouteDetail(Base,BatchModel):
     ticket_price = Column(Integer, nullable=False)
 
     @classmethod
-    async def get(cls,route_id,vehicle_id,*args,**kwargs):
-        query = select(cls).where(cls.route_id == route_id).where(cls.vehicle_id == vehicle_id)
+    async def get(cls,route_id,vehicle_id):
+        query = select(cls).where(cls.route_id == route_id,cls.vehicle_id == vehicle_id)
         results = await async_db_session.execute(query)
-        return results.scalar()
+        return results.scalars().all()
     
     @classmethod
     async def get_all_route(cls,route_name = None,vehicle_name = None, driver_name =None,*args,**kwargs):

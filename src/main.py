@@ -1,3 +1,4 @@
+import re
 from fastapi import FastAPI
 from .database import async_db_session
 
@@ -12,6 +13,10 @@ async def startup():
 @app.on_event("shutdown")
 async def shutdown():
     await async_db_session.close()
+    
+@app.get("/")
+async def root():
+    return "Connect successfully"
 
 from .services import *
 

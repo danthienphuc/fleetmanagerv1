@@ -1,3 +1,4 @@
+from urllib import response
 import pytest
 
 from httpx import AsyncClient
@@ -16,10 +17,9 @@ async def Client():
     (2, 3, 5)])
 @pytest.mark.asyncio
 async def test_add(Client,a, b, expected):
-
+    response = await Client.get("/")
+    assert response.json() == "Connect successfully"
     assert a + b == expected
-
-
 
 # Fleet tests
 ################################################################################
@@ -34,10 +34,10 @@ async def test_create_fleet(Client, name, description):
         json={
             "name": name,
             "description": description,
-        },
+        }
     )
     assert response.status_code == 200, response.text
-    assert response.json()["detail"] == "Created Successfully" 
+    assert response.json() == "Created Successfully" 
 
 @pytest.mark.parametrize("id,name,description", [
     ("1", "Test Fleet 1", "Test Fleet Description 1"),

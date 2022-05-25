@@ -134,13 +134,15 @@ async def create_route(data: schemas.RouteDetailCreate):
     return await models.RouteDetail.create(**data.dict())
 
 # Get route detail
-@api_routedetail.get("/{route_id}/{vehicle_id}", response_model = schemas.RouteDetail)
+@api_routedetail.get("/{route_id}/{vehicle_id}", response_model = List[schemas.RouteDetail])
 async def get_route_detail(route_id:int=None, vehicle_id:int=None):
-    return await models.RouteDetail.get(route_id, vehicle_id)
+    route = await models.RouteDetail.get(route_id, vehicle_id)
+    print(route)
+    return route
 
 
 # Get all routes details
-@api_routedetail.get("/", response_model = List[schemas.RouteDetail])
+@api_routedetail.get("/", response_model = List[schemas.RouteDetailBase])
 async def get_all_route_details():
     return await models.RouteDetail.get_all()
 
