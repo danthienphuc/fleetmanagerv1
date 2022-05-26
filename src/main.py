@@ -1,4 +1,3 @@
-import re
 from fastapi import FastAPI
 from .database import async_db_session
 

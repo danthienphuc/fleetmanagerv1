@@ -1,9 +1,5 @@
-import asyncio
-from operator import mod
-from pyexpat import model
-from typing import List, Optional
-from fastapi import FastAPI,APIRouter
-from .database import async_db_session
+from typing import List
+from fastapi import APIRouter
 
 from . import schemas, models
 

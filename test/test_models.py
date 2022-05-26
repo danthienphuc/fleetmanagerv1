@@ -19,7 +19,6 @@ async def Client():
 async def test_add(Client,a, b, expected):
     response = await Client.get("/")
     assert response.json() == "Connect successfully"
-    assert a + b == expected
 
 # Fleet tests
 ################################################################################

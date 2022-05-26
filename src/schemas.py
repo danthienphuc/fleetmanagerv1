@@ -1,8 +1,6 @@
-from datetime import date, datetime
-from re import S
 from typing import Optional
-
 from pydantic import BaseModel
+from datetime import date
 
 
 # Fleet schema

@@ -1,7 +1,6 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Date, join, null
+from sqlalchemy import Column, ForeignKey, Integer, String, Date, join
 from sqlalchemy import update,delete
 from sqlalchemy.future import select
-from sqlalchemy.orm import relationship
 
 from .database import Base, async_db_session
 
@@ -124,11 +123,11 @@ class RouteDetail(Base,BatchModel):
                 join(Vehicle,cls.vehicle_id==Vehicle.id).\
                     join(Driver,cls.driver_id == Driver.id))
         if(route_name):
-            query = query.filter(Route.name.like(route_name))
+            query = query.filter(Route.name.like("%"+route_name+"%"))
         if(vehicle_name):
-            query = query.filter(Vehicle.name.like(vehicle_name))
+            query = query.filter(Vehicle.name.like("%"+vehicle_name+"%"))
         if(driver_name):
-            query = query.filter(Driver.name.like(driver_name))
+            query = query.filter(Driver.name.like("%"+driver_name+"%"))
         
         results = await async_db_session.execute(query)
         return results.scalars().all()
