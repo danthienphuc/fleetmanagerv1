@@ -23,3 +23,8 @@ Xây dựng 1 backend application để quản lý 1 vài table (ví dụ là đ
 routes params: route's name, vehicle's name, driver's name
 
 https://testdriven.io/blog/fastapi-crud/
+
+
+model
+controller - logic + xu ly databse
+view - api

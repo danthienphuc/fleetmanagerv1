@@ -1,14 +1,92 @@
+from typing import Callable, Generator
 from urllib import response
+from sqlalchemy.ext.asyncio import AsyncSession
 import pytest
-
+from fastapi import FastAPI
+from sqlalchemy.orm import sessionmaker
 from httpx import AsyncClient
-
+from sqlalchemy.ext.asyncio import create_async_engine
 from ..src.main import app
 
+from asyncio import current_task
+from typing import AsyncGenerator
+from sqlalchemy.ext.asyncio import AsyncSession, async_scoped_session
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import close_all_sessions
+
+# @pytest.fixture
+# async def Client():
+#     async with AsyncClient(app=app, base_url='http://127.0.0.1:8000') as client:
+#         yield client
+
+
+@pytest.fixture()
+async def async_session() -> Generator:
+    test_engine = create_async_engine(
+            "postgresql+asyncpg://postgres:postgres@localhost/fleet_db",
+            echo=False,
+            pool_size=20, max_overflow=0
+        )
+        
+    # expire_on_commit=False will prevent attributes from being expired
+    # after commit.
+    async_sess = sessionmaker(
+        test_engine, expire_on_commit=False, class_=AsyncSession
+    )
+    yield async_sess
+    
 @pytest.fixture
-async def Client():
-    async with AsyncClient(app=app, base_url='http://127.0.0.1:8000') as client:
-        yield client
+def engine():
+    database_url = "postgresql+asyncpg://postgres:postgres@localhost/fleet_db"
+    engine = create_engine(url=database_url)
+    yield engine
+    engine.dispose()
+    close_all_sessions()
+
+@pytest.fixture()
+def app(engine) -> FastAPI:
+    yield app
+
+
+
+
+        
+@pytest.fixture()
+async def session() -> Generator:
+    async with async_db_session() as sess, sess.begin():
+        yield sess
+        
+async def create_session() -> AsyncGenerator[AsyncSession, None]:  # pragma: no cover
+    test_engine = create_async_engine(
+            "postgresql+asyncpg://postgres:postgres@localhost/fleet_db",
+            echo=False,
+            pool_size=20, max_overflow=0
+        )
+    async_sess = sessionmaker(
+        
+        test_engine, expire_on_commit=False, class_=AsyncSession
+    )
+    Session = async_scoped_session(async_session, scopefunc=current_task)
+    async with Session() as session:
+        yield session
+
+@pytest.fixture
+async def Client(app, session:AsyncSession) -> Generator:
+    # this needs to be defined inside this fixture
+    # this is generate that yields session retrieved from `session` fixture
+    def get_sess(): 
+        yield session
+    
+    app.dependency_overrides[create_session] =  get_sess
+        
+    async with AsyncClient(
+             app=app, base_url="http://127.0.0.1:8000", 
+             ) as ac:
+        yield ac
+
+    app.dependency_overrides = {}
+        
 
 @pytest.mark.parametrize("a,b,expected", [
     (1, 1, 2),
@@ -16,7 +94,7 @@ async def Client():
     (2, 2, 4),
     (2, 3, 5)])
 @pytest.mark.asyncio
-async def test_add(Client,a, b, expected):
+async def test_add(Client,a,b,expected):
     response = await Client.get("/")
     assert response.json() == "Connect successfully"
 
@@ -31,8 +109,8 @@ async def test_create_fleet(Client, name, description):
     response = await Client.post(
         "/fleets/",
         json={
-            'name': name,
-            'description': description,
+            'name': 'Test Fleet 1',
+            'description': 'Test Fleet Description 1',
         }
     )
     assert response.status_code == 200, response.text

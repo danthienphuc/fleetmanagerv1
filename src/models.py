@@ -2,14 +2,16 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Date, join
 from sqlalchemy import update,delete
 from sqlalchemy.future import select
 
-from .database import Base, async_db_session
+from .database import Base, async_db_session 
 
 
 class BatchModel:
     @classmethod
     async def create(cls, **kwargs):
-        async_db_session.add(cls(**kwargs))
-        await async_db_session.commit()
+        if session is None:
+            session = async_db_session
+        session.add(cls(**kwargs))
+        await session.commit()
         return "Created Successfully"
 
     @classmethod
