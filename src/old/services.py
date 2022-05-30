@@ -1,7 +1,9 @@
 from typing import List
 from fastapi import APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
-from . import schemas, models
+
+from src.old import models
+from .. import schemas
 
 
 # Fleet endpoint

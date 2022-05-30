@@ -1,20 +1,20 @@
 from typing import Generator
 from sqlalchemy import Column, ForeignKey, Integer, String, Date, join, update,delete
 from sqlalchemy.future import select
-from .session import async_db_session as session
+from .old.models import Route,Vehicle,Driver,RouteDetail
 
 
-async def create(cls,session, **kwargs):
+async def create_obj(cls,session, **kwargs):
     session.add(cls(**kwargs))
     await session.commit()
     return "Created Successfully"
 
-async def get(cls,session, id = None,*args,**kwargs):
+async def get_obj(cls,session, id = None):
     query = select(cls).where(cls.id == id)
     results = await session.execute(query)
     return results.scalar()
 
-async def get_all(cls,session,name = None,*args,**kwargs):
+async def get_all_obj(cls,session,name = None):
     if name is None:
         query = select(cls)
     else:
@@ -22,7 +22,7 @@ async def get_all(cls,session,name = None,*args,**kwargs):
     results = await session.execute(query)
     return results.scalars().all()
 
-async def update(cls,session, id,*args,**kwargs):
+async def update_obj(cls,session, id,**kwargs):
     query = (
         update(cls)
         .where(cls.id == id)
@@ -34,7 +34,7 @@ async def update(cls,session, id,*args,**kwargs):
     await session.commit()
     return "Updated Successfully"
 
-async def delete(cls,session, id,*args,**kwargs):
+async def delete_obj(cls,session, id):
     query = (
         delete(cls).where(cls.id == id)
     )
@@ -44,7 +44,7 @@ async def delete(cls,session, id,*args,**kwargs):
 
 
 
-async def get_all_fleet(cls,name = None,fleet_id = None,*args,**kwargs):
+async def get_all_fleet(cls,session,name = None,fleet_id = None,*args,**kwargs):
     query = select(cls)
     if name:
         query = query.filter(cls.name.like("%"+name+"%"))
@@ -53,13 +53,12 @@ async def get_all_fleet(cls,name = None,fleet_id = None,*args,**kwargs):
     results = await session.execute(query)
     return results.scalars().all()
 
-async def get_fleet(cls,route_id,vehicle_id):
+async def get_fleet(cls,session,route_id,vehicle_id):
     query = select(cls).where(cls.route_id == route_id,cls.vehicle_id == vehicle_id)
     results = await session.execute(query)
     return results.scalars().all()
 
-async def get_all_route(cls,route_name = None,vehicle_name = None, driver_name =None,*args,**kwargs):
-    
+async def get_all_route(cls,session,route_name = None,vehicle_name = None, driver_name =None,*args,**kwargs):
     query = select(Route).\
         select_from(join(cls, Route,cls.route_id==Route.id).\
             join(Vehicle,cls.vehicle_id==Vehicle.id).\
@@ -74,7 +73,7 @@ async def get_all_route(cls,route_name = None,vehicle_name = None, driver_name =
     results = await session.execute(query)
     return results.scalars().all()
 
-async def update(cls, route_id,vehicle_id,*args,**kwargs):
+async def update_route_detail(cls,session, route_id,vehicle_id,*args,**kwargs):
     query = (
         update(cls)
         .where(cls.route_id == route_id, cls.vehicle_id == vehicle_id)
@@ -86,7 +85,7 @@ async def update(cls, route_id,vehicle_id,*args,**kwargs):
     await session.commit()
     return "Updated Successfully"
 
-async def delete(cls, route_id,vehicle_id,*args,**kwargs):
+async def delete_route_detail(cls,session, route_id,vehicle_id,*args,**kwargs):
     query = (
         delete(cls).where(cls.route_id == route_id, cls.vehicle_id == vehicle_id)
     )

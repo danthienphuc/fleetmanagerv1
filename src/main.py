@@ -1,23 +1,22 @@
 from fastapi import FastAPI
-from .database import async_db_session
 
 app = FastAPI()
 
 
-@app.on_event("startup")
-async def startup():
-    await async_db_session.init()
-    await async_db_session.create_all()
+# @app.on_event("startup")
+# async def startup():
+#     await async_db_session.init()
+#     await async_db_session.create_all()
 
-@app.on_event("shutdown")
-async def shutdown():
-    await async_db_session.close()
+# @app.on_event("shutdown")
+# async def shutdown():
+#     await async_db_session.close()
     
 @app.get("/")
 async def root():
     return "Connect successfully"
 
-from .services import *
+from .view import *
 
 sv = [api_fleet, api_vehicle, api_driver, api_route, api_routedetail]
 
