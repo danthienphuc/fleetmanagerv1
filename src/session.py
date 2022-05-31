@@ -5,15 +5,14 @@ from sqlalchemy.ext.asyncio import create_async_engine,AsyncSession,async_scoped
 
 Base = declarative_base()
 
-async def async_db_session() -> AsyncGenerator[AsyncSession, None]:
-    engine = create_async_engine(
+
+engine = create_async_engine(
             "postgresql+asyncpg://postgres:postgres@localhost/fleet_db",
             echo=False,
             # pool_size=20, max_overflow=0
         )
-    # async with engine.begin() as conn:
-    #     await conn.run_sync(Base.metadata.drop_all)
-    #     await conn.run_sync(Base.metadata.create_all)
+
+async def async_db_session() -> AsyncGenerator[AsyncSession, None]:
 
     # expire_on_commit=False will prevent attributes from being expired
     # after commit.

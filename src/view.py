@@ -1,4 +1,5 @@
 from typing import List
+from urllib import response
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from . import schemas
@@ -6,12 +7,14 @@ from .controller import *
 from .session import async_db_session as session
 from .models import *
 
+
+
 # Fleet endpoint
 # -------------------------------------------------------------------------------------------------------------
 api_fleet = APIRouter(prefix="/fleets",tags=["Fleet"])
 
 # Create fleet
-@api_fleet.post("/")
+@api_fleet.post("/",response_model=schemas.Fleet)
 async def create_fleet(data: schemas.FleetCreate,session=Depends(session)):
     return await create_obj(Fleet,session,**data.dict())
 
@@ -27,8 +30,8 @@ async def get_fleets(name: str =None,session=Depends(session)):
 
 # Update fleet
 @api_fleet.put("/{id}")
-async def update_fleet(id: int, data: schemas.FleetBase):
-    return await update_obj(Fleet,session,id, **data.dict(),session=Depends(session))
+async def update_fleet(id: int, data: schemas.FleetBase,session=Depends(session)):
+    return await update_obj(Fleet,session,id, **data.dict())
 
 # Delete fleet
 @api_fleet.delete("/{id}")
@@ -51,8 +54,8 @@ async def get_vehicle(id: int = None,session=Depends(session)):
 
 # Get all vehicles
 @api_vehicle.get("/", response_model=List[schemas.Vehicle])
-async def get_vehicles(name: str = None,vehicle_id: int = None,session=Depends(session)):
-    return await get_all_obj(Vehicle, session,name, vehicle_id)
+async def get_vehicles(name: str = None,fleet_id: int = None,session=Depends(session)):
+    return await get_all_vehicles(Vehicle, session,name, fleet_id)
 
 # Update vehicle
 @api_vehicle.put("/{id}")
@@ -73,6 +76,7 @@ async def create_driver(data: schemas.DriverCreate,session=Depends(session)):
     return await create_obj(Driver, session, **data.dict())
 
 # Get driver by id
+@api_driver.get("/{id}")
 async def get_driver(id:int = None,session=Depends(session)):
     return await get_obj(Driver, session, id)
 
@@ -108,7 +112,7 @@ async def get_route(id:int=None,session=Depends(session)):
 # Get all routes
 @api_route.get("/", response_model = List[schemas.Route])
 async def get_all_routes(route_name: str= None, vehicle_name: str= None,driver_name: str= None,session=Depends(session)):
-    return await get_all_route(route_name, vehicle_name, driver_name)
+    return await get_all_route(session,route_name, vehicle_name, driver_name)
 
 # Update route
 @api_route.put("/{id}")
@@ -133,21 +137,21 @@ async def create_route(data: schemas.RouteDetailCreate,session=Depends(session))
 # Get route detail
 @api_routedetail.get("/{route_id}/{vehicle_id}", response_model = List[schemas.RouteDetail])
 async def get_route_detail(route_id:int=None, vehicle_id:int=None,session=Depends(session)):
-    route = await get_obj(RouteDetail, session, route_id, vehicle_id)
+    route = await get_route_detail( session, route_id, vehicle_id)
     print(route)
     return route
 
 # Get all routes details
 @api_routedetail.get("/",response_model = List[schemas.RouteDetail])
-async def get_all_route_details(,session=Depends(session)):
-    return await get_all_obj(RouteDetail, session, )
+async def get_all_route_details(RouteDetail,session=Depends(session)):
+    return await get_all_obj(RouteDetail, session)
 
 # Update route
 @api_routedetail.put("/{route_id}/{vehicle_id}")
 async def update_route(route_id:int,vehicle_id:int, data: schemas.RouteDetail,session=Depends(session)):
-    return await update_obj(RouteDetail, session, route_id,vehicle_id,**data.dict())
+    return await update_route_detail(session, route_id,vehicle_id,**data.dict())
 
 # Delete route
 @api_routedetail.delete("/{route_id}/{vehicle_id}")
 async def delete_route(route_id: int, vehicle_id: int,session=Depends(session)):
-    return await delete_obj(RouteDetail, session, route_id,vehicle_id)
+    return await delete_route_detail(session, route_id,vehicle_id)

@@ -36,7 +36,7 @@ async def test_session() -> AsyncGenerator[AsyncSession, None]:
     (None, None)
 ])
 @pytest.mark.asyncio
-async def test_create_fleet(name:str,description:str,test_session):
+async def test_create_fleet(name:str=Optional[None],description:str,test_session):
     fleet = FleetCreate(name = name, description=description)
     result = await create_obj(Fleet,test_session,**fleet.dict())
     assert result == "Created Successfully"

@@ -1,13 +1,14 @@
-from typing import Generator
-from sqlalchemy import Column, ForeignKey, Integer, String, Date, join, update,delete
+from sqlalchemy import join, update,delete
 from sqlalchemy.future import select
 from .old.models import Route,Vehicle,Driver,RouteDetail
 
 
 async def create_obj(cls,session, **kwargs):
-    session.add(cls(**kwargs))
+    obj = cls(**kwargs)
+    session.add(obj)
     await session.commit()
-    return "Created Successfully"
+    await session.refresh(obj)
+    return obj
 
 async def get_obj(cls,session, id = None):
     query = select(cls).where(cls.id == id)
@@ -44,7 +45,7 @@ async def delete_obj(cls,session, id):
 
 
 
-async def get_all_fleet(cls,session,name = None,fleet_id = None,*args,**kwargs):
+async def get_all_vehicles(cls,session,name = None,fleet_id = None,*args,**kwargs):
     query = select(cls)
     if name:
         query = query.filter(cls.name.like("%"+name+"%"))
@@ -53,16 +54,16 @@ async def get_all_fleet(cls,session,name = None,fleet_id = None,*args,**kwargs):
     results = await session.execute(query)
     return results.scalars().all()
 
-async def get_fleet(cls,session,route_id,vehicle_id):
+async def get_route_detail(cls,session,route_id,vehicle_id):
     query = select(cls).where(cls.route_id == route_id,cls.vehicle_id == vehicle_id)
     results = await session.execute(query)
     return results.scalars().all()
 
-async def get_all_route(cls,session,route_name = None,vehicle_name = None, driver_name =None,*args,**kwargs):
+async def get_all_route(session,route_name = None,vehicle_name = None, driver_name =None):
     query = select(Route).\
-        select_from(join(cls, Route,cls.route_id==Route.id).\
-            join(Vehicle,cls.vehicle_id==Vehicle.id).\
-                join(Driver,cls.driver_id == Driver.id))
+        select_from(join(Route,RouteDetail,RouteDetail.route_id==Route.id, isouter=True,full = True).\
+            join(Vehicle,RouteDetail.vehicle_id==Vehicle.id).\
+                join(Driver,RouteDetail.driver_id == Driver.id))
     if(route_name):
         query = query.filter(Route.name.like("%"+route_name+"%"))
     if(vehicle_name):
@@ -85,7 +86,7 @@ async def update_route_detail(cls,session, route_id,vehicle_id,*args,**kwargs):
     await session.commit()
     return "Updated Successfully"
 
-async def delete_route_detail(cls,session, route_id,vehicle_id,*args,**kwargs):
+async def delete_route_detail(cls,session, route_id,vehicle_id):
     query = (
         delete(cls).where(cls.route_id == route_id, cls.vehicle_id == vehicle_id)
     )

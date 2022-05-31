@@ -1,20 +1,20 @@
 from fastapi import FastAPI
+from src.session import engine,Base
 
 app = FastAPI()
-
-
-# @app.on_event("startup")
-# async def startup():
-#     await async_db_session.init()
-#     await async_db_session.create_all()
-
-# @app.on_event("shutdown")
-# async def shutdown():
-#     await async_db_session.close()
     
+    
+async def refresh():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+
+
 @app.get("/")
 async def root():
     return "Connect successfully"
+
+
 
 from .view import *
 
