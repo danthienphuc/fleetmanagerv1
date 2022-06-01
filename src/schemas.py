@@ -1,6 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel
-from datetime import date
+from datetime import datetime,date
 
 
 # Fleet schema
@@ -65,8 +65,8 @@ class Route(RouteBase):
 # Route Detail schema
 class RouteDetailBase(BaseModel):
     driver_id: int
-    start_time: Optional[date] = None
-    end_time: Optional[date] = None
+    start_time: Optional[datetime] = None
+    end_time: Optional[datetime] = None
     start_location: str
     end_location: str
     ticket_price: int

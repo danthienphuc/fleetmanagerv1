@@ -1,4 +1,4 @@
-from typing import Callable, Generator
+'''from typing import Callable, Generator
 from urllib import response
 from sqlalchemy.ext.asyncio import AsyncSession
 import pytest
@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from sqlalchemy.orm import sessionmaker
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import create_async_engine
-from ..src.main import app
+from ...src.main import app
 
 from asyncio import current_task
 from typing import AsyncGenerator
@@ -447,3 +447,4 @@ async def test_delete_fleet(Client, id):
     response = await Client.delete("/fleets/" + id)
     assert response.status_code == 204, response.text
     assert response.json()["detail"] == "Deleted successfully"
+'''
