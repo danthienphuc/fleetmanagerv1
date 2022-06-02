@@ -1,5 +1,5 @@
 /venv
 /migrations
-/**/__pycache__
+**pycache__
 /.pytest_cache
 /.vscode
