@@ -33,7 +33,7 @@ async def update_obj(cls,session, id,**kwargs):
 
     await session.execute(query)
     await session.commit()
-    return "Updated Successfully"
+    return "Update Successfully"
 
 async def delete_obj(cls,session, id):
     query = (

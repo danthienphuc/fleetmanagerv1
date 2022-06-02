@@ -1,12 +1,14 @@
 
 from datetime import date, datetime
+from os import name
+from re import I
 from typing import AsyncGenerator
 from asyncio import current_task
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine,AsyncSession,async_scoped_session
 import pytest
 from ..src.controller import *
-import src.schemas as schemas
+from ..src.schemas import *
 from ..src.models import *
 from ..src import settings
 
@@ -53,7 +55,7 @@ def string_to_date(string):
 ])
 @pytest.mark.asyncio
 async def test_create_fleet(name:str,description:str,id:int,test_session):
-    fleet = schemas.FleetCreate(name = name, description=description)
+    fleet = FleetCreate(name = name, description=description)
     response = await create_obj(Fleet,test_session,**fleet.dict())
     assert response.id == id
     assert response.name == name
@@ -66,7 +68,7 @@ async def test_create_fleet(name:str,description:str,id:int,test_session):
     ("Test Vehicle 3", "Test Vehicle Description 3", 3,3)])
 @pytest.mark.asyncio
 async def test_create_vehicle(name:str, description:str, fleet_id:int, id:int, test_session):
-    vehicle = schemas.VehicleCreate(name= name, description=description,fleet_id = fleet_id)
+    vehicle = VehicleCreate(name= name, description=description,fleet_id = fleet_id)
     response = await create_obj(Vehicle,test_session,**vehicle.dict())
     assert response.id == id
     assert response.name == name
@@ -80,7 +82,7 @@ async def test_create_vehicle(name:str, description:str, fleet_id:int, id:int, t
     ("Test Driver 3", '1987-06-09',3)])
 @pytest.mark.asyncio
 async def test_create_driver(name, age,id, test_session):
-    driver = schemas.DriverCreate(name=name, age=age)
+    driver = DriverCreate(name=name, age=age)
     response = await create_obj(Driver,test_session,**driver.dict())
     assert response.id == id
     assert response.name == name
@@ -93,7 +95,7 @@ async def test_create_driver(name, age,id, test_session):
     ("Test Route 3", "Test Route Description 3",3)])
 @pytest.mark.asyncio
 async def test_create_route(name,description,id, test_session):
-    route = schemas.RouteCreate(name=name, description=description)
+    route = RouteCreate(name=name, description=description)
     response = await create_obj(Route,test_session,**route.dict())
     assert response.id == id
     assert response.name == name
@@ -114,7 +116,7 @@ async def test_create_route(name,description,id, test_session):
 @pytest.mark.asyncio
 async def test_create_route_details(route_id,driver_id,vehicle_id\
     ,start_time,end_time,start_location,end_location,ticket_price,test_session):
-    route_detail = schemas.RouteDetailCreate(route_id=route_id,driver_id = driver_id\
+    route_detail = RouteDetailCreate(route_id=route_id,driver_id = driver_id\
         ,vehicle_id = vehicle_id, start_time = start_time, end_time = end_time\
             ,start_location = start_location,end_location= end_location\
                 , ticket_price = ticket_price)
@@ -323,7 +325,7 @@ async def test_get_route_detail_by_id(route_id, driver_id, vehicle_id, start_tim
 
 # Test update an object
 
-# Test update an fleet
+# Test update a fleet
 @pytest.mark.parametrize("id, name, description",
 [(1,"Test Fleet 1","Test Fleet Description 1"),
 (2,"Test Fleet 2","Test Fleet Description 2"),
@@ -331,11 +333,20 @@ async def test_get_route_detail_by_id(route_id, driver_id, vehicle_id, start_tim
 @pytest.mark.asyncio
 async def test_update_fleet_by_id(id, name, description,test_session):
     name = name + " Updated"
-    fleet = schemas.FleetBase(name=name,description=description)
-    response = await update_obj(cls = Fleet,session = test_session,id=id, data = fleet)
-    assert response.id == id
-    assert response.name == name
-    assert response.description == description
+    fleet = FleetBase(name=name,description=description)
+    response = await update_obj(Fleet,test_session,id, **fleet.dict())
+    assert response == "Update Successfully"
+    
+# Test update a vehicle
+@pytest.mark.parametrize("id, name, description,fleet id",
+                         [(1,"Test Vehicle 1","Test Vehicle Description 1",1),
+                          (2,"Test Vehicle 2","Test Vehicle Description 2",2),
+                          (3,"Test Vehicle 3","Test Vehicle Description 3",3)])
+@pytest.mark.asyncio
+async def test_update_vehicle_by_id(id,name,description,fleet_id,test_session):
+    name = name + " Updated"
+    
+    
 
 
 
