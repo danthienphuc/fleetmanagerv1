@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import APIRouter, Depends
-from ..src import schemas
+from . import schemas
 from .controller import *
 from .session import async_db_session as session
 from .models import *
@@ -137,7 +137,7 @@ async def create_route_detail(data: schemas.RouteDetailCreate,session=Depends(se
 # Get route detail
 @api_routedetail.get("/{route_id}/{vehicle_id}", response_model = schemas.RouteDetail)
 async def get_route_detail(route_id:int=None, vehicle_id:int=None,session=Depends(session)):
-    route = await get_route_detail( session, route_id, vehicle_id)
+    route = await get_route_detail_obj( session, route_id, vehicle_id)
     return route
 
 # Get all routes details

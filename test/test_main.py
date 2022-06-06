@@ -43,7 +43,7 @@ def test_create_fleet(Client, name, description, id):
 
 # Test create fleet with no name
 @pytest.mark.parametrize("name,description", [
-    (null, "Test Fleet Description 1")])
+    (None, "Test Fleet Description 1")])
 @pytest.mark.asyncio
 def test_create_fleet_with_no_name(Client, name, description):
     response = Client.post(
@@ -53,9 +53,11 @@ def test_create_fleet_with_no_name(Client, name, description):
             'description': description,
         }
     )
-    assert response.status_code == 400, response.text
+    assert response.status_code == 422, response.text
     assert response.json() == {
-'error': 'name is required'}
+        'detail': [{'loc': ['body', 'name'],
+        'msg': 'none is not an allowed value',
+        'type': 'type_error.none.not_allowed'}]}
 
 # Test create vehicle
 @pytest.mark.parametrize("name,description,fleet_id,id", [
@@ -258,8 +260,8 @@ def test_get_all_route_details(Client):
             'route_id': 1,
             'driver_id': 1,
             'vehicle_id': 1,
-            'start_time': '2020-01-01T00:00:00Z',
-            'end_time': '2020-01-01T00:00:00Z',
+            'start_time': '2020-01-01T00:00:00',
+            'end_time': '2020-01-01T00:00:00',
             'start_location': 'Test Start Location 1',
             'end_location': 'Test End Location 1',
             'ticket_price': 10
@@ -268,8 +270,8 @@ def test_get_all_route_details(Client):
             'route_id': 2,
             'driver_id': 2,
             'vehicle_id': 2,
-            'start_time': '2020-01-01T00:00:00Z',
-            'end_time': '2020-01-01T00:00:00Z',
+            'start_time': '2020-01-01T00:00:00',
+            'end_time': '2020-01-01T00:00:00',
             'start_location': 'Test Start Location 2',
             'end_location': 'Test End Location 2',
             'ticket_price': 20
@@ -278,8 +280,8 @@ def test_get_all_route_details(Client):
             'route_id': 3,
             'driver_id': 3,
             'vehicle_id': 3,
-            'start_time': '2020-01-01T00:00:00Z',
-            'end_time': '2020-01-01T00:00:00Z',
+            'start_time': '2020-01-01T00:00:00',
+            'end_time': '2020-01-01T00:00:00',
             'start_location': 'Test Start Location 3',
             'end_location': 'Test End Location 3',
             'ticket_price': 30
