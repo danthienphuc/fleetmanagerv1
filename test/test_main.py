@@ -459,9 +459,10 @@ def test_get_route_detail_by_id(Client, route_id, driver_id, vehicle_id, start_t
 def test_update_fleet_by_id(Client, id, name, description):
     name = name + " Updated"
     description = description + " Updated"
-    response = Client.put(f"/fleets/{id}/", json={
+    response = Client.put(f"/fleets/{id}/",
+    json={
         'name': name,
-        'description': description
+        'description': description,
     })
     assert response.status_code == 307, response.text
     assert response.json() == {"Updated Successfully"}
