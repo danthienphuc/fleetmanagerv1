@@ -6,7 +6,7 @@ from datetime import datetime,date
 # Fleet schema
 class FleetBase(BaseModel):
     name: str
-    description: str
+    description: Optional[str] = None
 
 class FleetCreate(FleetBase):
     pass
@@ -21,7 +21,7 @@ class Fleet(FleetBase):
 # Vehicle schema
 class VehicleBase(BaseModel):
     name: str
-    description: str
+    description: Optional[str] = None
     fleet_id: int
 
 class VehicleCreate(VehicleBase):
@@ -50,7 +50,7 @@ class Driver(DriverBase):
 # Route schema
 class RouteBase(BaseModel):
     name: str
-    description: str
+    description: Optional[str] = None
 
 
 class RouteCreate(RouteBase):
@@ -65,8 +65,8 @@ class Route(RouteBase):
 # Route Detail schema
 class RouteDetailBase(BaseModel):
     driver_id: int
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
+    start_time: datetime
+    end_time: datetime
     start_location: str
     end_location: str
     ticket_price: int

@@ -1,8 +1,6 @@
 from typing import List
-from urllib import response
 from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from . import schemas
+from ..src import schemas
 from .controller import *
 from .session import async_db_session as session
 from .models import *
@@ -55,7 +53,7 @@ async def get_vehicle(id: int = None,session=Depends(session)):
 # Get all vehicles
 @api_vehicle.get("/", response_model=List[schemas.Vehicle])
 async def get_vehicles(name: str = None,fleet_id: int = None,session=Depends(session)):
-    return await get_all_vehicles(Vehicle, session,name, fleet_id)
+    return await get_all_vehicles_obj(Vehicle, session,name, fleet_id)
 
 # Update vehicle
 @api_vehicle.put("/{id}")
@@ -112,7 +110,7 @@ async def get_route(id:int=None,session=Depends(session)):
 # Get all routes
 @api_route.get("/", response_model = List[schemas.Route])
 async def get_all_routes(route_name: str= None, vehicle_name: str= None,driver_name: str= None,session=Depends(session)):
-    return await get_all_route(session,route_name, vehicle_name, driver_name)
+    return await get_all_route_obj(session,route_name, vehicle_name, driver_name)
 
 # Update route
 @api_route.put("/{id}")
@@ -129,29 +127,32 @@ async def delete_route(id:int,session=Depends(session)):
 # -------------------------------------------------------------------------------------------------------------
 api_routedetail = APIRouter(prefix="/routedetails",tags=["Route Detail"])
 
-# Create route
+# Create route detail
 @api_routedetail.post("/")
-async def create_route(data: schemas.RouteDetailCreate,session=Depends(session)):
+async def create_route_detail(data: schemas.RouteDetailCreate,session=Depends(session)):
+    data.start_time = data.start_time.replace(tzinfo=None)
+    data.end_time = data.end_time.replace(tzinfo=None)
     return await create_obj(RouteDetail, session, **data.dict())
 
 # Get route detail
-@api_routedetail.get("/{route_id}/{vehicle_id}", response_model = List[schemas.RouteDetail])
+@api_routedetail.get("/{route_id}/{vehicle_id}", response_model = schemas.RouteDetail)
 async def get_route_detail(route_id:int=None, vehicle_id:int=None,session=Depends(session)):
     route = await get_route_detail( session, route_id, vehicle_id)
-    print(route)
     return route
 
 # Get all routes details
 @api_routedetail.get("/",response_model = List[schemas.RouteDetail])
-async def get_all_route_details(RouteDetail,session=Depends(session)):
+async def get_all_route_details(session=Depends(session)):
     return await get_all_obj(RouteDetail, session)
 
 # Update route
 @api_routedetail.put("/{route_id}/{vehicle_id}")
-async def update_route(route_id:int,vehicle_id:int, data: schemas.RouteDetail,session=Depends(session)):
-    return await update_route_detail(session, route_id,vehicle_id,**data.dict())
+async def update_route_detail(route_id:int,vehicle_id:int, data: schemas.RouteDetail,session=Depends(session)):
+    data.start_time = data.start_time.replace(tzinfo=None)
+    data.end_time = data.end_time.replace(tzinfo=None)
+    return await update_route_detail_obj(session, route_id,vehicle_id,**data.dict())
 
 # Delete route
 @api_routedetail.delete("/{route_id}/{vehicle_id}")
-async def delete_route(route_id: int, vehicle_id: int,session=Depends(session)):
-    return await delete_route_detail(session, route_id,vehicle_id)
+async def delete_route_detail(route_id: int, vehicle_id: int,session=Depends(session)):
+    return await delete_route_detail_obj(session,route_id,vehicle_id)

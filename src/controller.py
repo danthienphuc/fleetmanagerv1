@@ -1,6 +1,6 @@
 from sqlalchemy import join, update,delete
 from sqlalchemy.future import select
-from .old.models import Route,Vehicle,Driver,RouteDetail
+from .models import *
 
 
 async def create_obj(cls,session, **kwargs):
@@ -33,7 +33,7 @@ async def update_obj(cls,session, id,**kwargs):
 
     await session.execute(query)
     await session.commit()
-    return "Update Successfully"
+    return "Updated Successfully"
 
 async def delete_obj(cls,session, id):
     query = (
@@ -45,7 +45,7 @@ async def delete_obj(cls,session, id):
 
 
 
-async def get_all_vehicles(cls,session,name = None,fleet_id = None,*args,**kwargs):
+async def get_all_vehicles_obj(cls,session,name = None,fleet_id = None,*args,**kwargs):
     query = select(cls)
     if name:
         query = query.filter(cls.name.like("%"+name+"%"))
@@ -54,12 +54,12 @@ async def get_all_vehicles(cls,session,name = None,fleet_id = None,*args,**kwarg
     results = await session.execute(query)
     return results.scalars().all()
 
-async def get_route_detail(cls,session,route_id,vehicle_id):
-    query = select(cls).where(cls.route_id == route_id,cls.vehicle_id == vehicle_id)
+async def get_route_detail_obj(session,route_id,vehicle_id):
+    query = select(RouteDetail).where(RouteDetail.route_id == route_id,RouteDetail.vehicle_id == vehicle_id)
     results = await session.execute(query)
-    return results.scalars().all()
+    return results.scalar()
 
-async def get_all_route(session,route_name = None,vehicle_name = None, driver_name =None):
+async def get_all_route_obj(session,route_name = None,vehicle_name = None, driver_name =None):
     query = select(Route).\
         select_from(join(Route,RouteDetail,RouteDetail.route_id==Route.id, isouter=True,full = True).\
             join(Vehicle,RouteDetail.vehicle_id==Vehicle.id).\
@@ -74,7 +74,7 @@ async def get_all_route(session,route_name = None,vehicle_name = None, driver_na
     results = await session.execute(query)
     return results.scalars().all()
 
-async def update_route_detail(cls,session, route_id,vehicle_id,*args,**kwargs):
+async def update_route_detail_obj(cls,session, route_id,vehicle_id,*args,**kwargs):
     query = (
         update(cls)
         .where(cls.route_id == route_id, cls.vehicle_id == vehicle_id)
@@ -86,9 +86,9 @@ async def update_route_detail(cls,session, route_id,vehicle_id,*args,**kwargs):
     await session.commit()
     return "Updated Successfully"
 
-async def delete_route_detail(cls,session, route_id,vehicle_id):
+async def delete_route_detail_obj(session,route_id,vehicle_id):
     query = (
-        delete(cls).where(cls.route_id == route_id, cls.vehicle_id == vehicle_id)
+        delete(RouteDetail).where(RouteDetail.route_id == route_id, RouteDetail.vehicle_id == vehicle_id)
     )
     await session.execute(query)
     await session.commit()
