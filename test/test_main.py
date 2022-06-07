@@ -14,7 +14,6 @@ def Client() -> Generator:
 # Test the main app
 
 # Test Connection
-@pytest.mark.asyncio
 def test_add(Client):
     response = Client.get("/")
     assert response.json() == "Connect successfully"
@@ -26,7 +25,6 @@ def test_add(Client):
     ("Test Fleet 1", "Test Fleet Description 1",1),
     ("Test Fleet 2", "Test Fleet Description 2",2),
     ("Test Fleet 3", "Test Fleet Description 3",3)])
-@pytest.mark.asyncio
 def test_create_fleet(Client, name, description, id):
     response = Client.post(
         "/fleets/",
@@ -44,7 +42,6 @@ def test_create_fleet(Client, name, description, id):
 # Test create fleet with no name
 @pytest.mark.parametrize("name,description", [
     (None, "Test Fleet Description 1")])
-@pytest.mark.asyncio
 def test_create_fleet_with_no_name(Client, name, description):
     response = Client.post(
         "/fleets/",
@@ -64,7 +61,6 @@ def test_create_fleet_with_no_name(Client, name, description):
     ("Test Vehicle 1", "Test Vehicle Description 1",1,1),
     ("Test Vehicle 2", "Test Vehicle Description 2",2,2),
     ("Test Vehicle 3", "Test Vehicle Description 3",3,3)])
-@pytest.mark.asyncio
 def test_create_vehicle(Client, name, description, fleet_id, id):
     response = Client.post(
         "/vehicles/",
@@ -86,7 +82,6 @@ def test_create_vehicle(Client, name, description, fleet_id, id):
     ("Test Driver 1", "1980-01-01",1),
     ("Test Driver 2", "1980-01-02",2),
     ("Test Driver 3", "1980-01-03",3)])
-@pytest.mark.asyncio
 def test_create_driver(Client, name, age, id):
     response = Client.post(
         "/drivers/",
@@ -106,7 +101,6 @@ def test_create_driver(Client, name, age, id):
     ("Test Route 1", "Test Route Description 1",1),
     ("Test Route 2", "Test Route Description 2",2),
     ("Test Route 3", "Test Route Description 3",3)])
-@pytest.mark.asyncio
 def test_create_route(Client, name, description, id):
     response = Client.post(
         "/routes/",
@@ -126,7 +120,6 @@ def test_create_route(Client, name, description, id):
     (1, 1, 1, "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 1", "Test End Location 1", 10),
     (2, 2, 2, "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 2", "Test End Location 2", 20),
     (3, 3, 3, "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 3", "Test End Location 3", 30)])
-@pytest.mark.asyncio
 def test_create_route_detail(Client, route_id, driver_id, vehicle_id, start_time, end_time, start_location, end_location, ticket_price):
     response = Client.post(
         "/routedetails/",
@@ -158,7 +151,6 @@ def test_create_route_detail(Client, route_id, driver_id, vehicle_id, start_time
 # Test get all objects
 
 # Test get all fleets
-@pytest.mark.asyncio
 def test_get_all_fleets(Client):
     response = Client.get("/fleets/")
     assert response.status_code == 200, response.text
@@ -181,7 +173,6 @@ def test_get_all_fleets(Client):
     ]
 
 # Test get all vehicles
-@pytest.mark.asyncio
 def test_get_all_vehicles(Client):
     response = Client.get("/vehicles/")
     assert response.status_code == 200, response.text
@@ -206,7 +197,6 @@ def test_get_all_vehicles(Client):
     ]
 
 # Test get all drivers
-@pytest.mark.asyncio
 def test_get_all_drivers(Client):
     response = Client.get("/drivers/")
     assert response.status_code == 200, response.text
@@ -229,7 +219,6 @@ def test_get_all_drivers(Client):
     ]
 
 # Test get all routes
-@pytest.mark.asyncio
 def test_get_all_routes(Client):
     response = Client.get("/routes/")
     assert response.status_code == 200, response.text
@@ -251,7 +240,6 @@ def test_get_all_routes(Client):
     ]
 
 # Test get all route details
-@pytest.mark.asyncio
 def test_get_all_route_details(Client):
     response = Client.get("/routedetails/")
     assert response.status_code == 200, response.text
@@ -296,7 +284,6 @@ def test_get_all_route_details(Client):
     ("Test Fleet 2", 2, "Test Fleet 2", "Test Fleet Description 2"),
     ("Test Fleet 3", 3, "Test Fleet 3", "Test Fleet Description 3")
 ])
-@pytest.mark.asyncio
 def test_get_fleet_by_name(Client, key, id, name, description):
     response = Client.get(f"/fleets/?name={key}")
     assert response.status_code == 200, response.text
@@ -312,7 +299,6 @@ def test_get_fleet_by_name(Client, key, id, name, description):
     ("Fleet 2", 2, "Test Fleet 2", "Test Fleet Description 2"),
     ("Fleet 3", 3, "Test Fleet 3", "Test Fleet Description 3")
 ])
-@pytest.mark.asyncio
 def test_get_fleet_by_characters_in_name(Client, key, id, name, description):
     response = Client.get(f"/fleets/?name={key}")
     assert response.status_code == 200, response.text
@@ -328,7 +314,6 @@ def test_get_fleet_by_characters_in_name(Client, key, id, name, description):
     ("Test Vehicle 2", 2, "Test Vehicle 2", "Test Vehicle Description 2", 2),
     ("Test Vehicle 3", 3, "Test Vehicle 3", "Test Vehicle Description 3", 3)
 ])
-@pytest.mark.asyncio
 def test_get_vehicle_by_name(Client, key, id, name, description, fleet_id):
     response = Client.get(f"/vehicles/?name={key}")
     assert response.status_code == 200, response.text
@@ -345,7 +330,6 @@ def test_get_vehicle_by_name(Client, key, id, name, description, fleet_id):
     ("Vehicle 2", 2, "Test Vehicle 2", "Test Vehicle Description 2", 2),
     ("Vehicle 3", 3, "Test Vehicle 3", "Test Vehicle Description 3", 3)
 ])
-@pytest.mark.asyncio
 def test_get_vehicle_by_characters_in_name(Client, key, id, name, description, fleet_id):
     response = Client.get(f"/vehicles/?name={key}")
     assert response.status_code == 200, response.text
@@ -365,7 +349,6 @@ def test_get_vehicle_by_characters_in_name(Client, key, id, name, description, f
     (2, "Test Fleet 2", "Test Fleet Description 2"),
     (3, "Test Fleet 3", "Test Fleet Description 3")
 ])
-@pytest.mark.asyncio
 def test_get_fleet_by_id(Client, id, name, description):
     response = Client.get(f"/fleets/{id}/")
     assert response.status_code == 200, response.text
@@ -381,7 +364,6 @@ def test_get_fleet_by_id(Client, id, name, description):
     (2, "Test Vehicle 2", "Test Vehicle Description 2", 2),
     (3, "Test Vehicle 3", "Test Vehicle Description 3", 3)
 ])
-@pytest.mark.asyncio
 def test_get_vehicle_by_id(Client, id, name, description, fleet_id):
     response = Client.get(f"/vehicles/{id}/")
     assert response.status_code == 200, response.text
@@ -398,7 +380,6 @@ def test_get_vehicle_by_id(Client, id, name, description, fleet_id):
     (2, "Test Driver 2", "1980-01-02"),
     (3, "Test Driver 3", "1980-01-03")
 ])
-@pytest.mark.asyncio
 def test_get_driver_by_id(Client, id, name, age):
     response = Client.get(f"/drivers/{id}/")
     assert response.status_code == 200, response.text
@@ -414,7 +395,6 @@ def test_get_driver_by_id(Client, id, name, age):
     (2, "Test Route 2", "Test Route Description 2"),
     (3, "Test Route 3", "Test Route Description 3")
 ])
-@pytest.mark.asyncio
 def test_get_route_by_id(Client, id, name, description):
     response = Client.get(f"/routes/{id}/")
     assert response.status_code == 200, response.text
@@ -430,7 +410,6 @@ def test_get_route_by_id(Client, id, name, description):
     (2, 2, 2, "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 2", "Test End Location 2", 20),
     (3, 3, 3, "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 3", "Test End Location 3", 30)
 ])
-@pytest.mark.asyncio
 def test_get_route_detail_by_id(Client, route_id, driver_id, vehicle_id, start_time, end_time, start_location, end_location, ticket_price):
     response = Client.get(f"/routedetails/{route_id}/{vehicle_id}")
     assert response.status_code == 200, response.text
@@ -455,7 +434,6 @@ def test_get_route_detail_by_id(Client, route_id, driver_id, vehicle_id, start_t
     (2, "Test Fleet 2", "Test Fleet Description 2"),
     (3, "Test Fleet 3", "Test Fleet Description 3")
 ])
-@pytest.mark.asyncio
 def test_update_fleet_by_id(Client, id, name, description):
     name = name + " Updated"
     description = description + " Updated"
@@ -473,7 +451,6 @@ def test_update_fleet_by_id(Client, id, name, description):
     (2, "Test Vehicle 2", "Test Vehicle Description 2", 2),
     (3, "Test Vehicle 3", "Test Vehicle Description 3", 3)
 ])
-@pytest.mark.asyncio
 def test_update_vehicle_by_id(Client, id, name, description, fleet_id):
     name = name + " Updated"
     description = description + " Updated"
@@ -491,7 +468,6 @@ def test_update_vehicle_by_id(Client, id, name, description, fleet_id):
     (2, "Test Driver 2", "1980-01-02"),
     (3, "Test Driver 3", "1980-01-03")
 ])
-@pytest.mark.asyncio
 def test_update_driver_by_id(Client, id, name, age):
     name = name + " Updated"
     response = Client.put(f"/drivers/{id}/", json={
@@ -507,7 +483,6 @@ def test_update_driver_by_id(Client, id, name, age):
     (2, "Test Route 2", "Test Route Description 2"),
     (3, "Test Route 3", "Test Route Description 3")
 ])
-@pytest.mark.asyncio
 def test_update_route_by_id(Client, id, name, description):
     name = name + " Updated"
     description = description + " Updated"
@@ -524,7 +499,6 @@ def test_update_route_by_id(Client, id, name, description):
     (2, 2, 2, "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 2", "Test End Location 2", 20),
     (3, 3, 3, "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 3", "Test End Location 3", 30)
 ])
-@pytest.mark.asyncio
 def test_update_route_detail_by_id(Client, route_id, driver_id, vehicle_id, start_time, end_time, start_location, end_location, ticket_price):
     start_time = start_time.replace("Z", "")
     end_time = end_time.replace("Z", "")
@@ -545,51 +519,44 @@ def test_update_route_detail_by_id(Client, route_id, driver_id, vehicle_id, star
 
 # Test delete object by id
 
-# Test delete fleet by id
-@pytest.mark.parametrize("id", [1,2,3])
-@pytest.mark.asyncio
-def test_delete_fleet_by_id(Client, id):
-    response = Client.delete(f"/fleets/{id}/")
-    assert response.status_code == 307, response.text
-    assert response.json() == {"Deleted Successfully"}
-
-# Test delete vehicle by id
-@pytest.mark.parametrize("id", [1,2,3])
-@pytest.mark.asyncio
-def test_delete_vehicle_by_id(Client, id):
-    response = Client.delete(f"/vehicles/{id}/")
-    assert response.status_code == 307, response.text
-    assert response.json() == {"Deleted Successfully"}
-
-# Test delete driver by id
-@pytest.mark.parametrize("id", [1,2,3])
-@pytest.mark.asyncio
-def test_delete_driver_by_id(Client, id):
-    response = Client.delete(f"/drivers/{id}/")
-    assert response.status_code == 307, response.text
-    assert response.json() == {"Deleted Successfully"}
-
-# Test delete route by id
-@pytest.mark.parametrize("id", [1,2,3])
-@pytest.mark.asyncio
-def test_delete_route_by_id(Client, id):
-    response = Client.delete(f"/routes/{id}/")
-    assert response.status_code == 307, response.text
-    assert response.json() == {"Deleted Successfully"}
-
 # Test delete route detail by id
 @pytest.mark.parametrize("route_id, vehicle_id", [
     (1, 1),
     (2, 2),
     (3, 3)
 ])
-@pytest.mark.asyncio
 def test_delete_route_detail_by_id(Client, route_id, vehicle_id):
-    response = Client.delete(f"/routedetails/{route_id}/{vehicle_id}/")
-    assert response.status_code == 307, response.text
-    assert response.json() == {"Deleted Successfully"}
+    response = Client.delete(f"/routedetails/{route_id}/{vehicle_id}")
+    assert response.status_code == 200, response.text
+    assert response.json() == "Deleted Successfully"
 
+# Test delete vehicle by id
+@pytest.mark.parametrize("id", [1,2,3])
+def test_delete_vehicle_by_id(Client, id):
+    response = Client.delete(f"/vehicles/{id}")
+    assert response.status_code == 200, response.text
+    assert response.json() == "Deleted Successfully"
 
+# Test delete fleet by id
+@pytest.mark.parametrize("id", [1,2,3])
+def test_delete_fleet_by_id(Client, id):
+    response = Client.delete(f"/fleets/{id}")
+    assert response.status_code == 200, response.text
+    assert response.json() == "Deleted Successfully"
+
+# Test delete driver by id
+@pytest.mark.parametrize("id", [1,2,3])
+def test_delete_driver_by_id(Client, id):
+    response = Client.delete(f"/drivers/{id}")
+    assert response.status_code == 200, response.text
+    assert response.json() == "Deleted Successfully"
+
+# Test delete route by id
+@pytest.mark.parametrize("id", [1,2,3])
+def test_delete_route_by_id(Client, id):
+    response = Client.delete(f"/routes/{id}")
+    assert response.status_code == 200, response.text
+    assert response.json() == "Deleted Successfully"
 
 
 

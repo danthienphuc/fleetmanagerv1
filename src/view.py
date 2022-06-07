@@ -61,7 +61,7 @@ async def update_vehicle(id:int,data: schemas.VehicleBase,session=Depends(sessio
     return await update_obj(Vehicle, session,id, **data.dict())
 
 # Delete vehicle
-@api_vehicle.delete("/")
+@api_vehicle.delete("/{id}")
 async def delete_vehicles(id: int,session=Depends(session)):
     return await delete_obj(Vehicle, session,id)
 

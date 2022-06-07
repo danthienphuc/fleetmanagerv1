@@ -9,14 +9,17 @@ app = FastAPI()
 # Base.metadata.drop_all(bind=engine)
 # Base.metadata.create_all(bind=engine)
 
-@app.on_event("startup")  
-async def refresh():
-    async with engine.begin() as conn:
-        # await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
+# @app.on_event("startup")  
+# async def refresh():
+#     async with engine.begin() as conn:
+#         # await conn.run_sync(Base.metadata.drop_all)
+#         await conn.run_sync(Base.metadata.create_all)
 
 @app.get("/")
 async def root():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
     return "Connect successfully"
 
 

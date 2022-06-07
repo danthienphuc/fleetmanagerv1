@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine,AsyncSession,async_scoped_session
 import pytest
 from ..src.controller import *
-from ..src import models,schemas,settings
+from ..src import schemas,settings
 
 
 @pytest.fixture()
