@@ -373,7 +373,7 @@ end_time : str ,start_location:str,end_location:str,ticket_price:int,test_sessio
 @pytest.mark.create
 @pytest.mark.route_detail
 @pytest.mark.parametrize("route_id,vehicle_id,driver_id,start_time,end_time,start_location,end_location,ticket_price", [
-    (1, 12, 1, None, "2020-01-01T00:00:00Z", "Test Start Location 1", "Test End Location 1", 10)])
+    (1, 2, 1, None, "2020-01-01T00:00:00Z", "Test Start Location 1", "Test End Location 1", 10)])
 async def test_create_route_detail_with_none_start_time(route_id:int,driver_id:int,vehicle_id:int,start_time : str,
 end_time : str ,start_location:str,end_location:str,ticket_price:int,test_session:AsyncSession)->None:
     with pytest.raises(ValueError):
@@ -432,7 +432,7 @@ end_time : str ,start_location:str,end_location:str,ticket_price:int,test_sessio
     (-1, 3, 1, "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "Test Start Location 1", "Test End Location 1", 10)])
 async def test_create_route_detail_with_route_id_is_negative(route_id:int,driver_id:int,vehicle_id:int,start_time : str,
 end_time : str ,start_location:str,end_location:str,ticket_price:int,test_session:AsyncSession)->None:
-    with pytest.raises(ValueError):
+    with pytest.raises(IntegrityError):
         route_detail = schemas.RouteDetailCreate(
             route_id=route_id,driver_id = driver_id, vehicle_id = vehicle_id, start_time = datetime.strptime(start_time,'%Y-%m-%dT%H:%M:%SZ'), end_time = datetime.strptime(end_time,'%Y-%m-%dT%H:%M:%SZ'),
             start_location = start_location,end_location= end_location, ticket_price = ticket_price)
