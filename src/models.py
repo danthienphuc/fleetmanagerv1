@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 from pyparsing import Optional
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Date
@@ -42,7 +42,7 @@ class Driver(Base):
 
     id: int = Column(Integer, primary_key=True, index=True)
     name: str = Column(String(255), nullable=False)
-    age: str = Column(Date, nullable=False)
+    age: date = Column(Date, nullable=False)
     route_details: "RouteDetail" = relationship(
         "RouteDetail", cascade="all,delete-orphan", back_populates="driver"
     )

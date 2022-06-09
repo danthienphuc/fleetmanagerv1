@@ -211,7 +211,7 @@ async def get_route_detail(
 async def get_all_route_details(
     session: AsyncSession = Depends(session),
 ) -> List[RouteDetail]:
-    route_detail: List[RouteDetail] = await get_all_obj(RouteDetail, session, None)
+    route_detail: List[RouteDetail] = await get_all_obj(RouteDetail, session)
     return route_detail
 
 

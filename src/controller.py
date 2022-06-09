@@ -21,10 +21,9 @@ async def get_obj(cls: Any, session: AsyncSession, id: int) -> Any:
 
 
 async def get_all_obj(cls: Any, session: AsyncSession, name: str = Query(None)) -> Any:
-    if name is None:
-        query = select(cls)
-    else:
-        query = select(cls).where(cls.name.like("%" + name + "%"))
+    query = select(cls)
+    if name is not None:
+        query = query.filter(cls.name.like("%" + name + "%"))
     results = await session.execute(query)
     return results.scalars().all()
 
