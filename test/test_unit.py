@@ -331,8 +331,6 @@ end_time : str ,start_location:str,end_location:str,ticket_price:int,test_sessio
     route_detail = schemas.RouteDetailCreate(
         route_id=route_id,driver_id = driver_id, vehicle_id = vehicle_id, start_time = datetime.strptime(start_time,'%Y-%m-%dT%H:%M:%SZ'), end_time = datetime.strptime(end_time,'%Y-%m-%dT%H:%M:%SZ'),
         start_location = start_location,end_location= end_location, ticket_price = ticket_price)
-    route_detail.start_time = route_detail.start_time.replace(tzinfo=None)
-    route_detail.end_time = route_detail.end_time.replace(tzinfo=None)
     response = await create_obj(RouteDetail,test_session, **route_detail.dict())
     assert response.route_id == route_id
     assert response.driver_id == driver_id
@@ -734,8 +732,6 @@ async def test_update_route_by_id(id:int, name:str, description:str,test_session
 async def test_update_route_detail_by_id(route_id:int,driver_id:int,vehicle_id:int,start_time : str,
 end_time : str ,start_location:str,end_location:str,ticket_price:int,test_session:AsyncSession)->None:
     route_detail = schemas.RouteDetailBase(driver_id=driver_id,start_time = datetime.strptime(start_time,'%Y-%m-%dT%H:%M:%SZ'),end_time = datetime.strptime(end_time,'%Y-%m-%dT%H:%M:%SZ'),start_location=start_location,end_location=end_location,ticket_price=ticket_price)
-    route_detail.start_time = route_detail.start_time.replace(tzinfo=None)
-    route_detail.end_time = route_detail.end_time.replace(tzinfo=None)
     route_detail.start_location = start_location + " Updated"
     route_detail.end_location = end_location + " Updated"
     response = await update_route_detail_obj(test_session,route_id,vehicle_id, **route_detail.dict())

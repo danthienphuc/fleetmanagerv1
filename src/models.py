@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime,Date
 from sqlalchemy.orm import declarative_base, relationship
@@ -53,8 +54,8 @@ class RouteDetail(Base):
     route_id = Column(Integer, ForeignKey("routes.id"), primary_key=True, index = True)
     vehicle_id = Column(Integer, ForeignKey("vehicles.id"), primary_key=True, index = True)
     driver_id = Column(Integer, ForeignKey("drivers.id"),nullable=False)
-    start_time = Column(DateTime, nullable=False)
-    end_time = Column(DateTime, nullable=False)
+    start_time = Column(DateTime, default=datetime.utcnow,  nullable=False)
+    end_time = Column(DateTime, default=datetime.utcnow,  nullable=False)
     start_location = Column(String(255), nullable=False)
     end_location = Column(String(255), nullable=False)
     ticket_price = Column(Integer, nullable=False)

@@ -130,8 +130,6 @@ api_routedetail = APIRouter(prefix="/routedetails",tags=["Route Detail"])
 # Create route detail
 @api_routedetail.post("/")
 async def create_route_detail(data: schemas.RouteDetailCreate,session:AsyncSession=Depends(session))->Any:
-    data.start_time = data.start_time.replace(tzinfo=None)
-    data.end_time = data.end_time.replace(tzinfo=None)
     return await create_obj(RouteDetail, session, **data.dict())
 
 # Get route detail
@@ -147,8 +145,6 @@ async def get_all_route_details(session:AsyncSession=Depends(session))->Any:
 # Update route
 @api_routedetail.put("/{route_id}/{vehicle_id}")
 async def update_route_detail(route_id:int,vehicle_id:int, data: schemas.RouteDetailBase,session:AsyncSession=Depends(session))->str:
-    data.start_time = data.start_time.replace(tzinfo=None)
-    data.end_time = data.end_time.replace(tzinfo=None)
     return await update_route_detail_obj(session, route_id,vehicle_id,**data.dict())
 
 # Delete route
