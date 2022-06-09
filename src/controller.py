@@ -1,4 +1,5 @@
-from typing import List, Optional, Union
+from typing import List, Union
+from fastapi import Query
 from sqlalchemy import join, update, delete
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,9 +20,7 @@ async def get_obj(cls: Any, session: AsyncSession, id: int) -> Any:
     return results.scalar()
 
 
-async def get_all_obj(
-    cls: Any, session: AsyncSession, name: Union[str,None]
-) -> Any:
+async def get_all_obj(cls: Any, session: AsyncSession, name: str = Query(None)) -> Any:
     if name is None:
         query = select(cls)
     else:
@@ -65,12 +64,13 @@ async def get_all_vehicles_obj(
 
 async def get_route_detail_obj(
     session: AsyncSession, route_id: int, vehicle_id: int
-) -> Any:
+) -> RouteDetail:
     query = select(RouteDetail).where(
         RouteDetail.route_id == route_id, RouteDetail.vehicle_id == vehicle_id
     )
     results = await session.execute(query)
-    return results.scalar()
+    route_detail: RouteDetail = results.scalar()
+    return route_detail
 
 
 async def get_all_route_obj(
@@ -78,7 +78,7 @@ async def get_all_route_obj(
     route_name: str,
     vehicle_name: str,
     driver_name: str,
-) -> Any:
+) -> List[Route]:
     query = select(Route).select_from(
         join(
             Route,
@@ -98,7 +98,8 @@ async def get_all_route_obj(
         query = query.filter(Driver.name.like("%" + driver_name + "%"))
 
     results = await session.execute(query)
-    return results.scalars().all()
+    route: List[Route] = results.scalars().all()
+    return route
 
 
 async def update_route_detail_obj(

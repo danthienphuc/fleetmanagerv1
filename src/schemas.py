@@ -7,10 +7,8 @@ from datetime import datetime, date
 
 # Fleet schema
 class FleetBase(BaseModel):
-    name: str = Field(...,max_length=255, alias="Name", description="Name of fleet")
-    description: str = Field(
-        default=None, max_length=255, alias="Description"
-    )
+    name: str = Field(..., max_length=255, alias="Name", description="Name of fleet")
+    description: str = Field(default=None, max_length=255, alias="Description")
 
     class Config:
         allow_population_by_field_name = True
@@ -31,20 +29,23 @@ class Fleet(FleetBase):
 
 # Vehicle schema
 class VehicleBase(BaseModel):
-    name: str = Field(..., max_length= 255, alias="Name")
-    description: Optional[str] = Field(default=None, max_length=255,alias="Description")
+    name: str = Field(..., max_length=255, alias="Name")
+    description: Optional[str] = Field(
+        default=None, max_length=255, alias="Description"
+    )
     fleet_id: int = Field(..., alias="FleetID")
 
     class Config:
         allow_population_by_field_name = True
         orm_mode = True
 
+
 class VehicleCreate(VehicleBase):
     pass
 
 
 class Vehicle(VehicleBase):
-    id: int = Field(..., alias = "ID", description= "ID of Vehicle")
+    id: int = Field(..., alias="ID", description="ID of Vehicle")
 
     class Config:
         allow_population_by_field_name = True
@@ -53,7 +54,7 @@ class Vehicle(VehicleBase):
 
 # Driver schema
 class DriverBase(BaseModel):
-    name: str = Field(..., max_length = 255, alias = "Name")
+    name: str = Field(..., max_length=255, alias="Name")
     age: date = Field(..., alias="Age")
 
     class Config:
@@ -66,7 +67,7 @@ class DriverCreate(DriverBase):
 
 
 class Driver(DriverBase):
-    id: int = Field(..., alias="ID",description="ID of Driver")
+    id: int = Field(..., alias="ID", description="ID of Driver")
 
     class Config:
         allow_population_by_field_name = True
@@ -75,8 +76,10 @@ class Driver(DriverBase):
 
 # Route schema
 class RouteBase(BaseModel):
-    name: str = Field(..., max_length = 255, alias = "Name")
-    description: Optional[str] = Field(default=None, max_length = 255,alias="Description")
+    name: str = Field(..., max_length=255, alias="Name")
+    description: Optional[str] = Field(
+        default=None, max_length=255, alias="Description"
+    )
 
     class Config:
         allow_population_by_field_name = True
@@ -88,7 +91,7 @@ class RouteCreate(RouteBase):
 
 
 class Route(RouteBase):
-    id: int = Field(..., alias = "ID", description = "ID of Route")
+    id: int = Field(..., alias="ID", description="ID of Route")
 
     class Config:
         allow_population_by_field_name = True
@@ -97,12 +100,12 @@ class Route(RouteBase):
 
 # Route Detail schema
 class RouteDetailBase(BaseModel):
-    driver_id: int = Field(..., alias = "DriverID")
-    start_time: datetime = Field(..., alias = "StartTime")
-    end_time: datetime = Field(..., alias = "EndTime")
-    start_location: str = Field(..., max_length = 255, alias = "StartLocation")
-    end_location: str = Field(..., max_length = 255, alias="EndLocation")
-    ticket_price: int = Field(..., alias = "TicketPrice")
+    driver_id: int = Field(..., alias="DriverID")
+    start_time: datetime = Field(..., alias="StartTime")
+    end_time: datetime = Field(..., alias="EndTime")
+    start_location: str = Field(..., max_length=255, alias="StartLocation")
+    end_location: str = Field(..., max_length=255, alias="EndLocation")
+    ticket_price: int = Field(..., alias="TicketPrice")
 
     class Config:
         allow_population_by_field_name = True
@@ -110,8 +113,12 @@ class RouteDetailBase(BaseModel):
 
 
 class RouteDetailCreate(RouteDetailBase):
-    route_id: int = Field(..., alias = "RouteID", description = "RouteID index of Route Detail")
-    vehicle_id: int = Field(..., alias = "VehicleID", description = "VehicleID index of Route Detail")
+    route_id: int = Field(
+        ..., alias="RouteID", description="RouteID index of Route Detail"
+    )
+    vehicle_id: int = Field(
+        ..., alias="VehicleID", description="VehicleID index of Route Detail"
+    )
 
     class Config:
         allow_population_by_field_name = True
