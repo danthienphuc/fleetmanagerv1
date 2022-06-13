@@ -788,7 +788,7 @@ async def test_create_route_detail_with_route_id_is_negative(
 @pytest.mark.fleet
 @pytest.mark.asyncio
 async def test_get_all_fleets(test_session: AsyncSession) -> None:
-    response = await get_all_obj(Fleet, test_session)
+    response = await get_all_obj(Fleet, test_session,None)
     assert len(response) == 5
     assert response[0].id == 1
     assert response[0].name == "Test Fleet 1"
@@ -806,7 +806,7 @@ async def test_get_all_fleets(test_session: AsyncSession) -> None:
 @pytest.mark.vehicle
 @pytest.mark.asyncio
 async def test_get_all_vehicles(test_session: AsyncSession) -> None:
-    response = await get_all_obj(Vehicle, test_session)
+    response = await get_all_obj(Vehicle, test_session,None)
     assert len(response) == 5
     assert response[0].id == 1
     assert response[0].name == "Test Vehicle 1"
@@ -827,7 +827,7 @@ async def test_get_all_vehicles(test_session: AsyncSession) -> None:
 @pytest.mark.driver
 @pytest.mark.asyncio
 async def test_get_all_drivers(test_session: AsyncSession) -> None:
-    response = await get_all_obj(Driver, test_session)
+    response = await get_all_obj(Driver, test_session,None)
     assert len(response) == 4
     assert response[0].id == 1
     assert response[0].name == "Test Driver 1"
@@ -845,7 +845,7 @@ async def test_get_all_drivers(test_session: AsyncSession) -> None:
 @pytest.mark.route
 @pytest.mark.asyncio
 async def test_get_all_routes(test_session: AsyncSession) -> None:
-    response = await get_all_obj(Route, test_session)
+    response = await get_all_obj(Route, test_session,None)
     assert len(response) == 5
     assert response[0].id == 1
     assert response[0].name == "Test Route 1"
@@ -863,7 +863,7 @@ async def test_get_all_routes(test_session: AsyncSession) -> None:
 @pytest.mark.route_detail
 @pytest.mark.asyncio
 async def test_get_all_route_details(test_session: AsyncSession) -> None:
-    response = await get_all_obj(RouteDetail, test_session)
+    response = await get_all_obj(RouteDetail, test_session,None)
     assert len(response) == 3
     assert response[0].route_id == 1
     assert response[0].driver_id == 1
@@ -1011,7 +1011,7 @@ async def test_get_driver_by_id(
     response = await get_obj(Driver, test_session, id)
     assert response.id == id
     assert response.name == name
-    assert response.age == datetime.strptime(age, "%Y-%m-%d")
+    assert response.age == datetime.strptime(age, "%Y-%m-%d").date()
 
 
 # Test get an route

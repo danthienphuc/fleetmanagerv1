@@ -1,3 +1,4 @@
+from lib2to3.pgen2.token import OP
 from typing import List, Union
 from fastapi import Query
 from sqlalchemy import join, update, delete
@@ -53,23 +54,12 @@ async def get_all_vehicles_obj(
 ) -> List[Vehicle]:
     query = select(Vehicle)
     if name:
-        query = query.filter(Vehicle.name.like("%" + name + "%"))
+        query = query.filter(Vehicle.name.like("%" + name + "%"))  # type: ignore
     if fleet_id:
         query = query.filter(Vehicle.fleet_id == fleet_id)
     results = await session.execute(query)
     vehicle: List[Vehicle] = results.scalars().all()
     return vehicle
-
-
-async def get_route_detail_obj(
-    session: AsyncSession, route_id: int, vehicle_id: int
-) -> RouteDetail:
-    query = select(RouteDetail).where(
-        RouteDetail.route_id == route_id, RouteDetail.vehicle_id == vehicle_id
-    )
-    results = await session.execute(query)
-    route_detail: RouteDetail = results.scalar()
-    return route_detail
 
 
 async def get_all_route_obj(
@@ -90,16 +80,29 @@ async def get_all_route_obj(
         .join(Driver, RouteDetail.driver_id == Driver.id)
     )
     if route_name:
-        query = query.filter(Route.name.like("%" + route_name + "%"))
+        query = query.filter(Route.name.like("%" + route_name + "%"))  # type: ignore
     if vehicle_name:
-        query = query.filter(Vehicle.name.like("%" + vehicle_name + "%"))
+        query = query.filter(Vehicle.name.like("%" + vehicle_name + "%"))  # type: ignore
     if driver_name:
-        query = query.filter(Driver.name.like("%" + driver_name + "%"))
+        query = query.filter(Driver.name.like("%" + driver_name + "%"))  # type: ignore
 
     results = await session.execute(query)
     route: List[Route] = results.scalars().all()
     return route
 
+async def get_all_route_detail_obj(session: AsyncSession, name: str = Query(None)) -> Any:
+    results = await session.execute(select(RouteDetail))
+    return results.scalars().all()
+
+async def get_route_detail_obj(
+    session: AsyncSession, route_id: int, vehicle_id: int
+) -> RouteDetail:
+    query = select(RouteDetail).where(
+        RouteDetail.route_id == route_id, RouteDetail.vehicle_id == vehicle_id
+    )
+    results = await session.execute(query)
+    route_detail: RouteDetail = results.scalar()
+    return route_detail
 
 async def update_route_detail_obj(
     session: AsyncSession, route_id: int, vehicle_id: int, **kwargs: Any
