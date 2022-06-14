@@ -192,8 +192,6 @@ def test_create_route_detail(
         },
     )
     assert response.status_code == 200
-    # start_time = start_time.replace("Z", "")
-    # end_time = end_time.replace("Z", "")
     assert response.json() == {
         "RouteID": route_id,
         "DriverID": driver_id,
