@@ -1,4 +1,6 @@
+from optparse import Option
 from typing import Dict, Generator
+from pyparsing import Optional
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import null
@@ -35,12 +37,12 @@ def test_create_fleet(Client: TestClient, name: str, description: str, id: int) 
     response = Client.post(
         "/fleets/",
         json={
-            "name": name,
-            "description": description,
+            "Name": name,
+            "Description": description,
         },
     )
-    assert response.status_code == 200, response.text
-    assert response.json() == {"id": id, "name": name, "description": description}
+    assert response.status_code == 200
+    assert response.json() == {"ID": id, "Name": name, "Description": description}
 
 
 # Test create fleet with no name
@@ -51,20 +53,11 @@ def test_create_fleet_with_no_name(
     response = Client.post(
         "/fleets/",
         json={
-            "name": name,
-            "description": description,
+            "Name": name,
+            "Description": description,
         },
     )
-    assert response.status_code == 422, response.text
-    assert response.json() == {
-        "detail": [
-            {
-                "loc": ["body", "name"],
-                "msg": "none is not an allowed value",
-                "type": "type_error.none.not_allowed",
-            }
-        ]
-    }
+    assert response.status_code == 422
 
 
 # Test create vehicle
@@ -82,17 +75,17 @@ def test_create_vehicle(
     response = Client.post(
         "/vehicles/",
         json={
-            "name": name,
-            "description": description,
-            "fleet_id": fleet_id,
+            "Name": name,
+            "Description": description,
+            "FleetID": fleet_id,
         },
     )
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == {
-        "id": id,
-        "name": name,
-        "description": description,
-        "fleet_id": fleet_id,
+        "ID": id,
+        "Name": name,
+        "Description": description,
+        "FleetID": fleet_id,
     }
 
 
@@ -109,12 +102,12 @@ def test_create_driver(Client: TestClient, name: str, age: int, id: int) -> None
     response = Client.post(
         "/drivers/",
         json={
-            "name": name,
-            "age": age,
+            "Name": name,
+            "Age": age,
         },
     )
-    assert response.status_code == 200, response.text
-    assert response.json() == {"id": id, "name": name, "age": age}
+    assert response.status_code == 200
+    assert response.json() == {"ID": id, "Name": name, "Age": age}
 
 
 # Test create route
@@ -130,12 +123,12 @@ def test_create_route(Client: TestClient, name: str, description: str, id: int) 
     response = Client.post(
         "/routes/",
         json={
-            "name": name,
-            "description": description,
+            "Name": name,
+            "Description": description,
         },
     )
-    assert response.status_code == 200, response.text
-    assert response.json() == {"id": id, "name": name, "description": description}
+    assert response.status_code == 200
+    assert response.json() == {"ID": id, "Name": name, "Description": description}
 
 
 # Test create route detail
@@ -188,28 +181,28 @@ def test_create_route_detail(
     response = Client.post(
         "/routedetails/",
         json={
-            "route_id": route_id,
-            "vehicle_id": vehicle_id,
-            "driver_id": driver_id,
-            "start_time": start_time,
-            "end_time": end_time,
-            "start_location": start_location,
-            "end_location": end_location,
-            "ticket_price": ticket_price,
+            "RouteID": route_id,
+            "VehicleID": vehicle_id,
+            "DriverID": driver_id,
+            "StartTime": start_time,
+            "EndTime": end_time,
+            "StartLocation": start_location,
+            "EndLocation": end_location,
+            "TicketPrice": ticket_price,
         },
     )
-    assert response.status_code == 200, response.text
-    start_time = start_time.replace("Z", "")
-    end_time = end_time.replace("Z", "")
+    assert response.status_code == 200
+    # start_time = start_time.replace("Z", "")
+    # end_time = end_time.replace("Z", "")
     assert response.json() == {
-        "route_id": route_id,
-        "driver_id": driver_id,
-        "vehicle_id": vehicle_id,
-        "start_time": start_time,
-        "end_time": end_time,
-        "start_location": start_location,
-        "end_location": end_location,
-        "ticket_price": ticket_price,
+        "RouteID": route_id,
+        "DriverID": driver_id,
+        "VehicleID": vehicle_id,
+        "StartTime": start_time,
+        "EndTime": end_time,
+        "StartLocation": start_location,
+        "EndLocation": end_location,
+        "TicketPrice": ticket_price,
     }
 
 
@@ -218,36 +211,36 @@ def test_create_route_detail(
 # Test get all fleets
 def test_get_all_fleets(Client: TestClient) -> None:
     response = Client.get("/fleets/")
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == [
-        {"id": 1, "name": "Test Fleet 1", "description": "Test Fleet Description 1"},
-        {"id": 2, "name": "Test Fleet 2", "description": "Test Fleet Description 2"},
-        {"id": 3, "name": "Test Fleet 3", "description": "Test Fleet Description 3"},
+        {"ID": 1, "Name": "Test Fleet 1", "Description": "Test Fleet Description 1"},
+        {"ID": 2, "Name": "Test Fleet 2", "Description": "Test Fleet Description 2"},
+        {"ID": 3, "Name": "Test Fleet 3", "Description": "Test Fleet Description 3"},
     ]
 
 
 # Test get all vehicles
 def test_get_all_vehicles(Client: TestClient) -> None:
     response = Client.get("/vehicles/")
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == [
         {
-            "id": 1,
-            "name": "Test Vehicle 1",
-            "description": "Test Vehicle Description 1",
-            "fleet_id": 1,
+            "ID": 1,
+            "Name": "Test Vehicle 1",
+            "Description": "Test Vehicle Description 1",
+            "FleetID": 1,
         },
         {
-            "id": 2,
-            "name": "Test Vehicle 2",
-            "description": "Test Vehicle Description 2",
-            "fleet_id": 2,
+            "ID": 2,
+            "Name": "Test Vehicle 2",
+            "Description": "Test Vehicle Description 2",
+            "FleetID": 2,
         },
         {
-            "id": 3,
-            "name": "Test Vehicle 3",
-            "description": "Test Vehicle Description 3",
-            "fleet_id": 3,
+            "ID": 3,
+            "Name": "Test Vehicle 3",
+            "Description": "Test Vehicle Description 3",
+            "FleetID": 3,
         },
     ]
 
@@ -255,59 +248,59 @@ def test_get_all_vehicles(Client: TestClient) -> None:
 # Test get all drivers
 def test_get_all_drivers(Client: TestClient) -> None:
     response = Client.get("/drivers/")
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == [
-        {"id": 1, "name": "Test Driver 1", "age": "1980-01-01"},
-        {"id": 2, "name": "Test Driver 2", "age": "1980-01-02"},
-        {"id": 3, "name": "Test Driver 3", "age": "1980-01-03"},
+        {"ID": 1, "Name": "Test Driver 1", "Age": "1980-01-01"},
+        {"ID": 2, "Name": "Test Driver 2", "Age": "1980-01-02"},
+        {"ID": 3, "Name": "Test Driver 3", "Age": "1980-01-03"},
     ]
 
 
 # Test get all routes
 def test_get_all_routes(Client: TestClient) -> None:
     response = Client.get("/routes/")
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == [
-        {"id": 1, "name": "Test Route 1", "description": "Test Route Description 1"},
-        {"id": 2, "name": "Test Route 2", "description": "Test Route Description 2"},
-        {"id": 3, "name": "Test Route 3", "description": "Test Route Description 3"},
+        {"ID": 1, "Name": "Test Route 1", "Description": "Test Route Description 1"},
+        {"ID": 2, "Name": "Test Route 2", "Description": "Test Route Description 2"},
+        {"ID": 3, "Name": "Test Route 3", "Description": "Test Route Description 3"},
     ]
 
 
 # Test get all route details
 def test_get_all_route_details(Client: TestClient) -> None:
     response = Client.get("/routedetails/")
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == [
         {
-            "route_id": 1,
-            "driver_id": 1,
-            "vehicle_id": 1,
-            "start_time": "2020-01-01T00:00:00",
-            "end_time": "2020-01-01T00:00:00",
-            "start_location": "Test Start Location 1",
-            "end_location": "Test End Location 1",
-            "ticket_price": 10,
+            "RouteID": 1,
+            "DriverID": 1,
+            "VehicleID": 1,
+            "StartTime": "2020-01-01T00:00:00",
+            "EndTime": "2020-01-01T00:00:00",
+            "StartLocation": "Test Start Location 1",
+            "EndLocation": "Test End Location 1",
+            "TicketPrice": 10,
         },
         {
-            "route_id": 2,
-            "driver_id": 2,
-            "vehicle_id": 2,
-            "start_time": "2020-01-01T00:00:00",
-            "end_time": "2020-01-01T00:00:00",
-            "start_location": "Test Start Location 2",
-            "end_location": "Test End Location 2",
-            "ticket_price": 20,
+            "RouteID": 2,
+            "DriverID": 2,
+            "VehicleID": 2,
+            "StartTime": "2020-01-01T00:00:00",
+            "EndTime": "2020-01-01T00:00:00",
+            "StartLocation": "Test Start Location 2",
+            "EndLocation": "Test End Location 2",
+            "TicketPrice": 20,
         },
         {
-            "route_id": 3,
-            "driver_id": 3,
-            "vehicle_id": 3,
-            "start_time": "2020-01-01T00:00:00",
-            "end_time": "2020-01-01T00:00:00",
-            "start_location": "Test Start Location 3",
-            "end_location": "Test End Location 3",
-            "ticket_price": 30,
+            "RouteID": 3,
+            "DriverID": 3,
+            "VehicleID": 3,
+            "StartTime": "2020-01-01T00:00:00",
+            "EndTime": "2020-01-01T00:00:00",
+            "StartLocation": "Test Start Location 3",
+            "EndLocation": "Test End Location 3",
+            "TicketPrice": 30,
         },
     ]
 
@@ -327,8 +320,8 @@ def test_get_fleet_by_name(
     Client: TestClient, key: str, id: int, name: str, description: str
 ) -> None:
     response = Client.get(f"/fleets/?name={key}")
-    assert response.status_code == 200, response.text
-    assert response.json() == [{"id": id, "name": name, "description": description}]
+    assert response.status_code == 200
+    assert response.json() == [{"ID": id, "Name": name, "Description": description}]
 
 
 # Test get fleet by characters in name
@@ -344,8 +337,8 @@ def test_get_fleet_by_characters_in_name(
     Client: TestClient, key: str, id: int, name: str, description: str
 ) -> None:
     response = Client.get(f"/fleets/?name={key}")
-    assert response.status_code == 200, response.text
-    assert response.json() == [{"id": id, "name": name, "description": description}]
+    assert response.status_code == 200
+    assert response.json() == [{"ID": id, "Name": name, "Description": description}]
 
 
 # Test get vehicle by name
@@ -361,9 +354,9 @@ def test_get_vehicle_by_name(
     Client: TestClient, key: str, id: int, name: str, description: str, fleet_id: int
 ) -> None:
     response = Client.get(f"/vehicles/?name={key}")
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == [
-        {"id": id, "name": name, "description": description, "fleet_id": fleet_id}
+        {"ID": id, "Name": name, "Description": description, "FleetID": fleet_id}
     ]
 
 
@@ -380,9 +373,31 @@ def test_get_vehicle_by_characters_in_name(
     Client: TestClient, key: str, id: int, name: str, description: str, fleet_id: int
 ) -> None:
     response = Client.get(f"/vehicles/?name={key}")
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == [
-        {"id": id, "name": name, "description": description, "fleet_id": fleet_id}
+        {"ID": id, "Name": name, "Description": description, "FleetID": fleet_id}
+    ]
+
+
+# Test get routes by name
+@pytest.mark.parametrize("vehicle_name,route_name,driver_name", [("e", "e", "e")])
+def test_get_routes_by_name(
+    Client: TestClient,
+    vehicle_name: str,
+    route_name: str,
+    driver_name: str,
+    id: int,
+    name: str,
+    description: str,
+) -> None:
+    response = Client.get(
+        f"/routes/?route_name={vehicle_name}&vehicle_name={route_name}&driver_name={driver_name}"
+    )
+    assert response.status_code == 200
+    assert response.json() == [
+        {"ID": 1, "Name": "Test Route 1", "Description": "Test Route Description 1"},
+        {"ID": 2, "Name": "Test Route 2", "Description": "Test Route Description 2"},
+        {"ID": 3, "Name": "Test Route 3", "Description": "Test Route Description 3"},
     ]
 
 
@@ -401,8 +416,8 @@ def test_get_fleet_by_id(
     Client: TestClient, id: int, name: str, description: str
 ) -> None:
     response = Client.get(f"/fleets/{id}")
-    assert response.status_code == 200, response.text
-    assert response.json() == {"id": id, "name": name, "description": description}
+    assert response.status_code == 200
+    assert response.json() == {"ID": id, "Name": name, "Description": description}
 
 
 # Test get vehicle by id
@@ -418,12 +433,12 @@ def test_get_vehicle_by_id(
     Client: TestClient, id: int, name: str, description: str, fleet_id: int
 ) -> None:
     response = Client.get(f"/vehicles/{id}")
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == {
-        "id": id,
-        "name": name,
-        "description": description,
-        "fleet_id": fleet_id,
+        "ID": id,
+        "Name": name,
+        "Description": description,
+        "FleetID": fleet_id,
     }
 
 
@@ -438,8 +453,8 @@ def test_get_vehicle_by_id(
 )
 def test_get_driver_by_id(Client: TestClient, id: int, name: str, age: str) -> None:
     response = Client.get(f"/drivers/{id}")
-    assert response.status_code == 200, response.text
-    assert response.json() == {"id": id, "name": name, "age": age}
+    assert response.status_code == 200
+    assert response.json() == {"ID": id, "Name": name, "Age": age}
 
 
 # Test get route by id
@@ -455,8 +470,8 @@ def test_get_route_by_id(
     Client: TestClient, id: int, name: str, description: str
 ) -> None:
     response = Client.get(f"/routes/{id}")
-    assert response.status_code == 200, response.text
-    assert response.json() == {"id": id, "name": name, "description": description}
+    assert response.status_code == 200
+    assert response.json() == {"ID": id, "Name": name, "Description": description}
 
 
 # Test get route detail by id
@@ -507,16 +522,16 @@ def test_get_route_detail_by_id(
     ticket_price: int,
 ) -> None:
     response = Client.get(f"/routedetails/{route_id}/{vehicle_id}")
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == {
-        "route_id": route_id,
-        "driver_id": driver_id,
-        "vehicle_id": vehicle_id,
-        "start_time": start_time,
-        "end_time": end_time,
-        "start_location": start_location,
-        "end_location": end_location,
-        "ticket_price": ticket_price,
+        "RouteID": route_id,
+        "DriverID": driver_id,
+        "Vehicle_ID": vehicle_id,
+        "StartTime": start_time,
+        "EndTime": end_time,
+        "StartLocation": start_location,
+        "EndLocation": end_location,
+        "TicketPrice": ticket_price,
     }
 
 
@@ -539,11 +554,11 @@ def test_update_fleet_by_id(
     response = Client.put(
         f"/fleets/{id}",
         json={
-            "name": name,
-            "description": description,
+            "Name": name,
+            "Description": description,
         },
     )
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == "Updated Successfully"
 
 
@@ -563,9 +578,9 @@ def test_update_vehicle_by_id(
     description = description + " Updated"
     response = Client.put(
         f"/vehicles/{id}",
-        json={"name": name, "description": description, "fleet_id": fleet_id},
+        json={"Name": name, "Description": description, "FleetID": fleet_id},
     )
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == "Updated Successfully"
 
 
@@ -580,8 +595,8 @@ def test_update_vehicle_by_id(
 )
 def test_update_driver_by_id(Client: TestClient, id: int, name: str, age: str) -> None:
     name = name + " Updated"
-    response = Client.put(f"/drivers/{id}", json={"name": name, "age": age})
-    assert response.status_code == 200, response.text
+    response = Client.put(f"/drivers/{id}", json={"Name": name, "Age": age})
+    assert response.status_code == 200
     assert response.json() == "Updated Successfully"
 
 
@@ -600,9 +615,9 @@ def test_update_route_by_id(
     name = name + " Updated"
     description = description + " Updated"
     response = Client.put(
-        f"/routes/{id}", json={"name": name, "description": description}
+        f"/routes/{id}", json={"Name": name, "Description": description}
     )
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == "Updated Successfully"
 
 
@@ -660,15 +675,15 @@ def test_update_route_detail_by_id(
     response = Client.put(
         f"/routedetails/{route_id}/{vehicle_id}",
         json={
-            "driver_id": driver_id,
-            "start_time": start_time,
-            "end_time": end_time,
-            "start_location": start_location,
-            "end_location": end_location,
-            "ticket_price": ticket_price,
+            "DriverID": driver_id,
+            "StartTime": start_time,
+            "EndTime": end_time,
+            "StartLocation": start_location,
+            "EndLocation": end_location,
+            "TicketPrice": ticket_price,
         },
     )
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == "Updated Successfully"
 
 
@@ -680,7 +695,7 @@ def test_delete_route_detail_by_id(
     Client: TestClient, route_id: int, vehicle_id: int
 ) -> None:
     response = Client.delete(f"/routedetails/{route_id}/{vehicle_id}")
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == "Deleted Successfully"
 
 
@@ -688,7 +703,7 @@ def test_delete_route_detail_by_id(
 @pytest.mark.parametrize("id", [1, 2, 3])
 def test_delete_vehicle_by_id(Client: TestClient, id: int) -> None:
     response = Client.delete(f"/vehicles/{id}")
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == "Deleted Successfully"
 
 
@@ -696,7 +711,7 @@ def test_delete_vehicle_by_id(Client: TestClient, id: int) -> None:
 @pytest.mark.parametrize("id", [1, 2, 3])
 def test_delete_fleet_by_id(Client: TestClient, id: int) -> None:
     response = Client.delete(f"/fleets/{id}")
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == "Deleted Successfully"
 
 
@@ -704,7 +719,7 @@ def test_delete_fleet_by_id(Client: TestClient, id: int) -> None:
 @pytest.mark.parametrize("id", [1, 2, 3])
 def test_delete_driver_by_id(Client: TestClient, id: int) -> None:
     response = Client.delete(f"/drivers/{id}")
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == "Deleted Successfully"
 
 
@@ -712,5 +727,5 @@ def test_delete_driver_by_id(Client: TestClient, id: int) -> None:
 @pytest.mark.parametrize("id", [1, 2, 3])
 def test_delete_route_by_id(Client: TestClient, id: int) -> None:
     response = Client.delete(f"/routes/{id}")
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     assert response.json() == "Deleted Successfully"

@@ -1,3 +1,4 @@
+import logging
 from typing import List
 from fastapi import APIRouter, Depends, Query
 from . import schemas
@@ -108,7 +109,7 @@ async def create_driver(
 
 
 # Get driver by id
-@api_driver.get("/{id}")
+@api_driver.get("/{id}", response_model=schemas.Driver)
 async def get_driver(id: int, session: AsyncSession = Depends(session)) -> Driver:
     driver: Driver = await get_obj(Driver, session, id)
     return driver
@@ -165,9 +166,13 @@ async def get_all_routes(
     driver_name: str = Query(None),
     session: AsyncSession = Depends(session),
 ) -> List[Route]:
-    route: List[Route] = await get_all_route_obj(
-        session, route_name, vehicle_name, driver_name
-    )
+    route: List[Route]
+    if route_name or vehicle_name or driver_name:
+        route = await get_route_obj_by_name(
+            session, route_name, vehicle_name, driver_name
+        )
+    else:
+        route = await get_all_obj(Route, session, None)
     return route
 
 
@@ -190,11 +195,13 @@ async def delete_route(id: int, session: AsyncSession = Depends(session)) -> str
 api_routedetail = APIRouter(prefix="/routedetails", tags=["Route Detail"])
 
 # Create route detail
-@api_routedetail.post("/")
+@api_routedetail.post("/", response_model=schemas.RouteDetail)
 async def create_route_detail(
     data: schemas.RouteDetailCreate, session: AsyncSession = Depends(session)
 ) -> RouteDetail:
-    route_detail: RouteDetail = await create_obj(RouteDetail, session, **data.dict())
+    # data.start_time = data.start_time.replace(tzinfo=None)
+    # data.end_time = data.end_time.replace(tzinfo=None)
+    route_detail: RouteDetail = await create_obj_db(RouteDetail, session, **data.dict())
     return route_detail
 
 
@@ -203,7 +210,10 @@ async def create_route_detail(
 async def get_route_detail(
     route_id: int, vehicle_id: int, session: AsyncSession = Depends(session)
 ) -> RouteDetail:
-    return await get_route_detail_obj(session, route_id, vehicle_id)
+    route_detail: RouteDetail = await get_route_detail_obj(
+        session, route_id, vehicle_id
+    )
+    return route_detail
 
 
 # Get all routes details
@@ -211,7 +221,7 @@ async def get_route_detail(
 async def get_all_route_details(
     session: AsyncSession = Depends(session),
 ) -> List[RouteDetail]:
-    route_detail: List[RouteDetail] = await get_all_obj(RouteDetail,session,None)
+    route_detail: List[RouteDetail] = await get_all_obj(RouteDetail, session, None)
     return route_detail
 
 

@@ -24,7 +24,6 @@ class Fleet(FleetBase):
 
     class Config:
         allow_population_by_field_name = True
-        orm_mode = True
 
 
 # Vehicle schema
@@ -54,7 +53,7 @@ class Vehicle(VehicleBase):
 
 # Driver schema
 class DriverBase(BaseModel):
-    name: str = Field(..., max_length=255, alias="Name")
+    name: str = Field(..., alias="Name", max_length=255)
     age: date = Field(..., alias="Age")
 
     class Config:

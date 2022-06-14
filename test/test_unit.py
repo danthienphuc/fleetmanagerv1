@@ -75,7 +75,7 @@ async def test_create_fleet(
 @pytest.mark.create
 @pytest.mark.fleet
 @pytest.mark.parametrize(
-    "name, description,id", [("Test Fleet 4", "Test Fleet Description 4", 4)]
+    "name, description,id", [("Test Fleet 2", "Test Fleet Description 2", 2)]
 )
 @pytest.mark.asyncio
 async def test_create_fleet_with_same_name(
@@ -105,7 +105,7 @@ async def test_create_fleet_with_none_name(
 # Test create fleet with None description
 @pytest.mark.create
 @pytest.mark.fleet
-@pytest.mark.parametrize("name, description,id", [("Test Fleet 5", None, 5)])
+@pytest.mark.parametrize("name, description,id", [("Test Fleet 4", None, 4)])
 async def test_create_fleet_with_none_description(
     name: str, description: str, id: int, test_session: AsyncSession
 ) -> None:
@@ -291,7 +291,7 @@ async def test_create_driver_with_same_name(
     response = await create_obj(Driver, test_session, **driver.dict())
     assert response.id == id
     assert response.name == name
-    assert response.age == datetime.strptime(age, "%Y-%m-%d")
+    assert response.age == datetime.strptime(age, "%Y-%m-%d").date()
 
 
 # Test create driver with None name raise an error
@@ -469,7 +469,7 @@ async def test_create_route_details(
         end_location=end_location,
         ticket_price=ticket_price,
     )
-    response = await create_obj(RouteDetail, test_session, **route_detail.dict())
+    response = await create_obj_db(RouteDetail, test_session, **route_detail.dict())
     assert response.route_id == route_id
     assert response.driver_id == driver_id
     assert response.vehicle_id == vehicle_id
@@ -600,7 +600,7 @@ async def test_create_route_detail_with_none_start_time(
             route_id=route_id,
             driver_id=driver_id,
             vehicle_id=vehicle_id,
-            start_time=datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%SZ"),
+            start_time=start_time,
             end_time=datetime.strptime(end_time, "%Y-%m-%dT%H:%M:%SZ"),
             start_location=start_location,
             end_location=end_location,
@@ -724,7 +724,7 @@ async def test_create_route_detail_with_route_id_is_not_int(
     ticket_price: int,
     test_session: AsyncSession,
 ) -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(IntegrityError):
         route_detail = schemas.RouteDetailCreate(
             route_id=route_id,
             driver_id=driver_id,
@@ -735,7 +735,7 @@ async def test_create_route_detail_with_route_id_is_not_int(
             end_location=end_location,
             ticket_price=ticket_price,
         )
-        await create_obj(RouteDetail, test_session, **route_detail.dict())
+        await create_obj_db(RouteDetail, test_session, **route_detail.dict())
 
 
 # Test Create Route Detail with route_id is negative raise error
@@ -778,7 +778,7 @@ async def test_create_route_detail_with_route_id_is_negative(
             end_location=end_location,
             ticket_price=ticket_price,
         )
-        await create_obj(RouteDetail, test_session, **route_detail.dict())
+        await create_obj_db(RouteDetail, test_session, **route_detail.dict())
 
 
 # Test get all objects
@@ -788,8 +788,8 @@ async def test_create_route_detail_with_route_id_is_negative(
 @pytest.mark.fleet
 @pytest.mark.asyncio
 async def test_get_all_fleets(test_session: AsyncSession) -> None:
-    response = await get_all_obj(Fleet, test_session,None)
-    assert len(response) == 5
+    response = await get_all_obj(Fleet, test_session, None)
+    assert len(response) == 4
     assert response[0].id == 1
     assert response[0].name == "Test Fleet 1"
     assert response[0].description == "Test Fleet Description 1"
@@ -806,7 +806,7 @@ async def test_get_all_fleets(test_session: AsyncSession) -> None:
 @pytest.mark.vehicle
 @pytest.mark.asyncio
 async def test_get_all_vehicles(test_session: AsyncSession) -> None:
-    response = await get_all_obj(Vehicle, test_session,None)
+    response = await get_all_obj(Vehicle, test_session, None)
     assert len(response) == 5
     assert response[0].id == 1
     assert response[0].name == "Test Vehicle 1"
@@ -827,7 +827,7 @@ async def test_get_all_vehicles(test_session: AsyncSession) -> None:
 @pytest.mark.driver
 @pytest.mark.asyncio
 async def test_get_all_drivers(test_session: AsyncSession) -> None:
-    response = await get_all_obj(Driver, test_session,None)
+    response = await get_all_obj(Driver, test_session, None)
     assert len(response) == 4
     assert response[0].id == 1
     assert response[0].name == "Test Driver 1"
@@ -845,7 +845,7 @@ async def test_get_all_drivers(test_session: AsyncSession) -> None:
 @pytest.mark.route
 @pytest.mark.asyncio
 async def test_get_all_routes(test_session: AsyncSession) -> None:
-    response = await get_all_obj(Route, test_session,None)
+    response = await get_all_obj(Route, test_session, None)
     assert len(response) == 5
     assert response[0].id == 1
     assert response[0].name == "Test Route 1"
@@ -863,7 +863,7 @@ async def test_get_all_routes(test_session: AsyncSession) -> None:
 @pytest.mark.route_detail
 @pytest.mark.asyncio
 async def test_get_all_route_details(test_session: AsyncSession) -> None:
-    response = await get_all_obj(RouteDetail, test_session,None)
+    response = await get_all_obj(RouteDetail, test_session, None)
     assert len(response) == 3
     assert response[0].route_id == 1
     assert response[0].driver_id == 1
