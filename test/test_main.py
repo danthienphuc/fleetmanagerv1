@@ -1,9 +1,6 @@
-from optparse import Option
-from typing import Dict, Generator
-from pyparsing import Optional
+from typing import Generator
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import null
 
 from ..src.main import app
 

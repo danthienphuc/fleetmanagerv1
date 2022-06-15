@@ -1,5 +1,5 @@
 {
-    "fleets":[
+    "Fleet":[
         {
             "id" : 1,
             "name" : "Test Fleet 1",
@@ -16,7 +16,7 @@
             "description" : "Test Fleet 3 Description"
         }
     ],
-    "vehicles":[
+    "Vehicle":[
         {
             "id" : 1,
             "name" : "Test Vehicle 1",
@@ -36,7 +36,7 @@
             "fleet_id" : 2
         }
     ],
-    "drivers":[
+    "Driver":[
         {
             "id" : 1,
             "name" : "Test Driver 1",
@@ -53,7 +53,7 @@
             "age" : "14-10-1990"
         }
     ],
-    "routes":[
+    "Route":[
         {
             "id" : 1,
             "name" : "Test Route 1",
@@ -70,7 +70,7 @@
             "description" : "Test Route 3 Description"
         }
     ],
-    "route_details":[
+    "RouteDetail":[
         {
             "route_id" : 1,
             "vehicle_id" : 1,

@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import (
 import pytest
 from ..src.controller import *
 from ..src import schemas, settings
-
+from load_json import load_json
 
 @pytest.fixture()
 def test_engine() -> Generator[AsyncEngine, None, None]:
