@@ -71,8 +71,8 @@ class RouteDetail(Base):
         Integer, ForeignKey("vehicles.id"), primary_key=True, index=True
     )
     driver_id: int = Column(Integer, ForeignKey("drivers.id"), nullable=False)
-    start_time: datetime = Column(DateTime, default=datetime.utcnow(), nullable=False)
-    end_time: datetime = Column(DateTime, default=datetime.utcnow(), nullable=False)
+    start_time: datetime = Column(DateTime(timezone=True), default=datetime.utcnow(), nullable=False)
+    end_time: datetime = Column(DateTime(timezone=True), default=datetime.utcnow(), nullable=False)
     start_location: str = Column(String(255), nullable=False)
     end_location: str = Column(String(255), nullable=False)
     ticket_price: int = Column(Integer, nullable=False)

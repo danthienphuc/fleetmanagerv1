@@ -5,7 +5,7 @@ from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from .models import *
 
-
+# Create obj in database
 async def create_obj_db(cls: Any, session: AsyncSession, **kwargs: Any) -> Any:
     obj = cls(**kwargs)
     session.add(obj)
@@ -13,7 +13,7 @@ async def create_obj_db(cls: Any, session: AsyncSession, **kwargs: Any) -> Any:
     await session.refresh(obj)
     return obj
 
-
+# Check name is exist or not when create object
 async def create_obj(cls: Any, session: AsyncSession, **kwargs: Any) -> Any:
     results = await session.execute(select(cls).where(cls.name == kwargs["name"]))
     obj = results.scalar()
@@ -21,13 +21,13 @@ async def create_obj(cls: Any, session: AsyncSession, **kwargs: Any) -> Any:
         obj = await create_obj_db(cls, session, **kwargs)
     return obj
 
-
+# Get obj by id
 async def get_obj(cls: Any, session: AsyncSession, id: int) -> Any:
     query = select(cls).where(cls.id == id)
     results = await session.execute(query)
     return results.scalar()
 
-
+# Get all obj from database, if name is not None, get obj by name
 async def get_all_obj(cls: Any, session: AsyncSession, name: str = Query(None)) -> Any:
     query = select(cls)
     if name is not None:
@@ -35,7 +35,7 @@ async def get_all_obj(cls: Any, session: AsyncSession, name: str = Query(None)) 
     results = await session.execute(query)
     return results.scalars().all()
 
-
+# Update obj in database
 async def update_obj(cls: Any, session: AsyncSession, id: int, **kwargs: Any) -> str:
     query = (
         update(cls)
@@ -48,14 +48,28 @@ async def update_obj(cls: Any, session: AsyncSession, id: int, **kwargs: Any) ->
     await session.commit()
     return "Updated Successfully"
 
-
+# Delete obj from database
 async def delete_obj(cls: Any, session: AsyncSession, id: int) -> str:
     query = delete(cls).where(cls.id == id)
     await session.execute(query)
     await session.commit()
     return "Deleted Successfully"
 
+# Check fleet id is exist or not when create vehicle
+async def create_vehicle_obj(
+    session: AsyncSession, name: str, fleet_id: int
+) -> Vehicle:
+    query = select(Vehicle).where(Vehicle.fleet_id == fleet_id)
+    results = await session.execute(query)
+    temp = results.scalar()
+    if temp is None:
+        temp = await create_obj(Vehicle, session, name=name, fleet_id=fleet_id)
+    vehicle : Vehicle = temp
+    return vehicle
 
+# Get all vehicle from database,
+# if name is not None, get vehicle by name
+# if fleet_id is not None, get vehicle by fleet_id
 async def get_all_vehicles_obj(
     session: AsyncSession, name: str, fleet_id: int
 ) -> List[Vehicle]:
@@ -68,7 +82,7 @@ async def get_all_vehicles_obj(
     vehicle: List[Vehicle] = results.scalars().all()
     return vehicle
 
-
+# Get route detail by route name
 async def get_route_obj_by_name(
     session: AsyncSession,
     route_name: str,
@@ -100,14 +114,7 @@ async def get_route_obj_by_name(
     route: List[Route] = results.scalars().all()
     return route
 
-
-async def get_all_route_detail_obj(
-    session: AsyncSession, name: str = Query(None)
-) -> Any:
-    results = await session.execute(select(RouteDetail))
-    return results.scalars().all()
-
-
+# Get route detail by route id and vehicle id
 async def get_route_detail_obj(
     session: AsyncSession, route_id: int, vehicle_id: int
 ) -> Any:
@@ -118,7 +125,7 @@ async def get_route_detail_obj(
     route_detail = results.scalar()
     return route_detail
 
-
+# Update route detail by route id and vehicle id
 async def update_route_detail_obj(
     session: AsyncSession, route_id: int, vehicle_id: int, **kwargs: Any
 ) -> str:
@@ -133,7 +140,7 @@ async def update_route_detail_obj(
     await session.commit()
     return "Updated Successfully"
 
-
+# Delete route detail by route id and vehicle id
 async def delete_route_detail_obj(
     session: AsyncSession, route_id: int, vehicle_id: int
 ) -> str:

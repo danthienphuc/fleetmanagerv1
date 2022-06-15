@@ -59,7 +59,7 @@ api_vehicle = APIRouter(prefix="/vehicles", tags=["Vehicle"])
 async def create_vehicle(
     data: schemas.VehicleCreate, session: AsyncSession = Depends(session)
 ) -> Vehicle:
-    vehicle: Vehicle = await create_obj(Vehicle, session, **data.dict())
+    vehicle: Vehicle = await create_vehicle_obj( session, **data.dict())
     return vehicle
 
 
@@ -199,8 +199,8 @@ api_routedetail = APIRouter(prefix="/routedetails", tags=["Route Detail"])
 async def create_route_detail(
     data: schemas.RouteDetailCreate, session: AsyncSession = Depends(session)
 ) -> RouteDetail:
-    # data.start_time = data.start_time.replace(tzinfo=None)
-    # data.end_time = data.end_time.replace(tzinfo=None)
+    data.start_time = datetime.strptime(data.start_time, "%Y-%m-%dT%H:%M:%SZ")
+    data.end_time = datetime.strptime(data.end_time, "%Y-%m-%dT%H:%M:%SZ")
     route_detail: RouteDetail = await create_obj_db(RouteDetail, session, **data.dict())
     return route_detail
 

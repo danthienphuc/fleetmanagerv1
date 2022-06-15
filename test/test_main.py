@@ -25,6 +25,8 @@ def test_add(Client: TestClient) -> None:
 # Test create object
 
 # Test create fleet
+@pytest.mark.create
+@pytest.mark.fleet
 @pytest.mark.parametrize(
     "name,description,id",
     [
@@ -46,6 +48,8 @@ def test_create_fleet(Client: TestClient, name: str, description: str, id: int) 
 
 
 # Test create fleet with no name
+@pytest.mark.create
+@pytest.mark.fleet
 @pytest.mark.parametrize("name,description", [(None, "Test Fleet Description 1")])
 def test_create_fleet_with_no_name(
     Client: TestClient, name: str, description: str
@@ -59,6 +63,23 @@ def test_create_fleet_with_no_name(
     )
     assert response.status_code == 422
 
+# Test create fleet with same name
+@pytest.mark.create
+@pytest.mark.fleet
+@pytest.mark.parametrize(
+    "name,description,id",
+    [("Test Fleet 1", "Test Fleet Description 1", 1)]
+)
+def test_create_fleet_with_same_name(name: str, description: str, id: int) -> None:
+    response = Client.post(
+        "/fleets/",
+        json={
+            "Name": name,
+            "Description": description,
+        },
+    )
+    assert response.status_code == 200
+    assert response.json() == {"ID": id, "Name": name, "Description": description}
 
 # Test create vehicle
 @pytest.mark.parametrize(
@@ -140,7 +161,7 @@ def test_create_route(Client: TestClient, name: str, description: str, id: int) 
             1,
             1,
             "2020-01-01T00:00:00Z",
-            "2020-01-01T00:00:00Z",
+            "2020-01-01T00:0r0:00Z",
             "Test Start Location 1",
             "Test End Location 1",
             10,
@@ -191,6 +212,9 @@ def test_create_route_detail(
             "TicketPrice": ticket_price,
         },
     )
+    print("\n\n\n")
+    print(response.json())
+    print("\n\n\n")
     assert response.status_code == 200
     assert response.json() == {
         "RouteID": route_id,
@@ -383,10 +407,7 @@ def test_get_routes_by_name(
     Client: TestClient,
     vehicle_name: str,
     route_name: str,
-    driver_name: str,
-    id: int,
-    name: str,
-    description: str,
+    driver_name: str
 ) -> None:
     response = Client.get(
         f"/routes/?route_name={vehicle_name}&vehicle_name={route_name}&driver_name={driver_name}"
