@@ -1,0 +1,105 @@
+{
+    "fleets":[
+        {
+            "id" : 1,
+            "name" : "Test Fleet 1",
+            "description" : "Test Fleet 1 Description"
+        },
+        {
+            "id" : 2,
+            "name" : "Test Fleet 2",
+            "description" : "Test Fleet 2 Description"
+        },
+        {
+            "id" : 3,
+            "name" : "Test Fleet 3",
+            "description" : "Test Fleet 3 Description"
+        }
+    ],
+    "vehicles":[
+        {
+            "id" : 1,
+            "name" : "Test Vehicle 1",
+            "description" : "Test Vehicle 1 Description",
+            "fleet_id" : 1
+        },
+        {
+            "id" : 2,
+            "name" : "Test Vehicle 2",
+            "description" : "Test Vehicle 2 Description",
+            "fleet_id" : 1
+        },
+        {
+            "id" : 3,
+            "name" : "Test Vehicle 3",
+            "description" : "Test Vehicle 3 Description",
+            "fleet_id" : 2
+        }
+    ],
+    "drivers":[
+        {
+            "id" : 1,
+            "name" : "Test Driver 1",
+            "age" : "14-10-1990"
+        },
+        {
+            "id" : 2,
+            "name" : "Test Driver 2",
+            "age" : "14-10-1990"
+        },
+        {
+            "id" : 3,
+            "name" : "Test Driver 3",
+            "age" : "14-10-1990"
+        }
+    ],
+    "routes":[
+        {
+            "id" : 1,
+            "name" : "Test Route 1",
+            "description" : "Test Route 1 Description"
+        },
+        {
+            "id" : 2,
+            "name" : "Test Route 2",
+            "description" : "Test Route 2 Description"
+        },
+        {
+            "id" : 3,
+            "name" : "Test Route 3",
+            "description" : "Test Route 3 Description"
+        }
+    ],
+    "route_details":[
+        {
+            "route_id" : 1,
+            "vehicle_id" : 1,
+            "driver_id" : 1,
+            "start_time" : "15-06-2022T00:00:00.000Z",
+            "end_time" : "15-06-2022T00:00:00.000Z",
+            "start_location" : "Test Start Location",
+            "end_location" : "Test End Location",
+            "ticket_price" : 100
+        },
+        {
+            "route_id" : 2,
+            "vehicle_id" : 2,
+            "driver_id" : 2,
+            "start_time" : "15-06-2022T00:00:00.000Z",
+            "end_time" : "15-06-2022T00:00:00.000Z",
+            "start_location" : "Test Start Location",
+            "end_location" : "Test End Location",
+            "ticket_price" : 100
+        },
+        {
+            "route_id" : 3,
+            "vehicle_id" : 3,
+            "driver_id" : 3,
+            "start_time" : "15-06-2022T00:00:00.000Z",
+            "end_time" : "15-06-2022T00:00:00.000Z",
+            "start_location" : "Test Start Location",
+            "end_location" : "Test End Location",
+            "ticket_price" : 100
+        }
+    ]
+}

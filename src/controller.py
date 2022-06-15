@@ -55,15 +55,16 @@ async def delete_obj(cls: Any, session: AsyncSession, id: int) -> str:
     await session.commit()
     return "Deleted Successfully"
 
-# Check fleet id is exist or not when create vehicle
+# Create vehicle in database check fleet_id is exist or not
 async def create_vehicle_obj(
-    session: AsyncSession, name: str, fleet_id: int
+    session: AsyncSession, name: str, description: str, fleet_id: int
 ) -> Vehicle:
     query = select(Vehicle).where(Vehicle.fleet_id == fleet_id)
     results = await session.execute(query)
     temp = results.scalar()
     if temp is None:
-        temp = await create_obj(Vehicle, session, name=name, fleet_id=fleet_id)
+        temp = await create_obj(Vehicle, session, name=name, description = description, fleet_id=fleet_id)
+    print(temp.id)
     vehicle : Vehicle = temp
     return vehicle
 
@@ -113,6 +114,24 @@ async def get_route_obj_by_name(
     results = await session.execute(query)
     route: List[Route] = results.scalars().all()
     return route
+
+# Create route detail if route_id and vehicle_id and driver_id are exist
+async def create_route_detail_obj(
+    session: AsyncSession, **kwargs: Any
+) -> RouteDetail:
+    query = select(RouteDetail).where(
+        RouteDetail.route_id == kwargs["route_id"],
+        RouteDetail.vehicle_id == kwargs["vehicle_id"],
+        RouteDetail.driver_id == kwargs["driver_id"]
+    )
+    results = await session.execute(query)
+    temp = results.scalar()
+    if temp is None:
+        # kwargs["start_time"] = kwargs["start_time"].replace(tzinfo=datetime.utcnow().tzinfo)
+        # kwargs["end_time"] = kwargs["end_time"].replace(tzinfo=datetime.utcnow().tzinfo)
+        temp = await create_obj_db(RouteDetail, session, **kwargs)
+    route_detail: RouteDetail = temp
+    return route_detail
 
 # Get route detail by route id and vehicle id
 async def get_route_detail_obj(

@@ -17,6 +17,8 @@ def Client() -> Generator[TestClient, None, None]:
 # Test the main app
 
 # Test Connection
+@pytest.mark.main
+@pytest.mark.refresh_db
 def test_add(Client: TestClient) -> None:
     response = Client.get("/")
     assert response.json() == "Connect successfully"
@@ -25,6 +27,7 @@ def test_add(Client: TestClient) -> None:
 # Test create object
 
 # Test create fleet
+@pytest.mark.main
 @pytest.mark.create
 @pytest.mark.fleet
 @pytest.mark.parametrize(
@@ -48,6 +51,7 @@ def test_create_fleet(Client: TestClient, name: str, description: str, id: int) 
 
 
 # Test create fleet with no name
+@pytest.mark.main
 @pytest.mark.create
 @pytest.mark.fleet
 @pytest.mark.parametrize("name,description", [(None, "Test Fleet Description 1")])
@@ -64,13 +68,14 @@ def test_create_fleet_with_no_name(
     assert response.status_code == 422
 
 # Test create fleet with same name
+@pytest.mark.main
 @pytest.mark.create
 @pytest.mark.fleet
 @pytest.mark.parametrize(
     "name,description,id",
     [("Test Fleet 1", "Test Fleet Description 1", 1)]
 )
-def test_create_fleet_with_same_name(name: str, description: str, id: int) -> None:
+def test_create_fleet_with_same_name(Client: TestClient,name: str, description: str, id: int) -> None:
     response = Client.post(
         "/fleets/",
         json={
@@ -82,6 +87,9 @@ def test_create_fleet_with_same_name(name: str, description: str, id: int) -> No
     assert response.json() == {"ID": id, "Name": name, "Description": description}
 
 # Test create vehicle
+@pytest.mark.main
+@pytest.mark.create
+@pytest.mark.vehicle
 @pytest.mark.parametrize(
     "name,description,fleet_id,id",
     [
@@ -111,6 +119,9 @@ def test_create_vehicle(
 
 
 # Test create driver
+@pytest.mark.main
+@pytest.mark.create
+@pytest.mark.driver
 @pytest.mark.parametrize(
     "name,age,id",
     [
@@ -132,6 +143,9 @@ def test_create_driver(Client: TestClient, name: str, age: int, id: int) -> None
 
 
 # Test create route
+@pytest.mark.main
+@pytest.mark.create
+@pytest.mark.route
 @pytest.mark.parametrize(
     "name,description,id",
     [
@@ -153,6 +167,9 @@ def test_create_route(Client: TestClient, name: str, description: str, id: int) 
 
 
 # Test create route detail
+@pytest.mark.main
+@pytest.mark.create
+@pytest.mark.route_detail
 @pytest.mark.parametrize(
     "route_id,driver_id,vehicle_id,start_time,end_time,start_location,end_location,ticket_price",
     [
@@ -160,8 +177,8 @@ def test_create_route(Client: TestClient, name: str, description: str, id: int) 
             1,
             1,
             1,
-            "2020-01-01T00:00:00Z",
-            "2020-01-01T00:0r0:00Z",
+            "2022-06-15T09:51:10.025Z",
+            "2022-06-15T09:51:10.025Z",
             "Test Start Location 1",
             "Test End Location 1",
             10,
@@ -170,8 +187,8 @@ def test_create_route(Client: TestClient, name: str, description: str, id: int) 
             2,
             2,
             2,
-            "2020-01-01T00:00:00Z",
-            "2020-01-01T00:00:00Z",
+            "2022-06-15T09:51:10.025Z",
+            "2022-06-15T09:51:10.025Z",
             "Test Start Location 2",
             "Test End Location 2",
             20,
@@ -180,8 +197,8 @@ def test_create_route(Client: TestClient, name: str, description: str, id: int) 
             3,
             3,
             3,
-            "2020-01-01T00:00:00Z",
-            "2020-01-01T00:00:00Z",
+            "2022-06-15T09:51:10.025Z",
+            "2022-06-15T09:51:10.025Z",
             "Test Start Location 3",
             "Test End Location 3",
             30,
@@ -199,33 +216,22 @@ def test_create_route_detail(
     end_location: str,
     ticket_price: int,
 ) -> None:
-    response = Client.post(
-        "/routedetails/",
-        json={
+    temp = {
             "RouteID": route_id,
             "VehicleID": vehicle_id,
             "DriverID": driver_id,
-            "StartTime": start_time,
-            "EndTime": end_time,
+            "StartTime": start_time.replace("Z", "000"),
+            "EndTime": end_time.replace("Z", "000"),
             "StartLocation": start_location,
             "EndLocation": end_location,
             "TicketPrice": ticket_price,
-        },
+        }
+    response = Client.post(
+        "/routedetails/",
+        json= temp,
     )
-    print("\n\n\n")
-    print(response.json())
-    print("\n\n\n")
     assert response.status_code == 200
-    assert response.json() == {
-        "RouteID": route_id,
-        "DriverID": driver_id,
-        "VehicleID": vehicle_id,
-        "StartTime": start_time,
-        "EndTime": end_time,
-        "StartLocation": start_location,
-        "EndLocation": end_location,
-        "TicketPrice": ticket_price,
-    }
+    assert response.json() == temp
 
 
 # Test get all objects
@@ -298,8 +304,8 @@ def test_get_all_route_details(Client: TestClient) -> None:
             "RouteID": 1,
             "DriverID": 1,
             "VehicleID": 1,
-            "StartTime": "2020-01-01T00:00:00",
-            "EndTime": "2020-01-01T00:00:00",
+            "StartTime": "2022-06-15T09:51:10.025000",
+            "EndTime": "2022-06-15T09:51:10.025000",
             "StartLocation": "Test Start Location 1",
             "EndLocation": "Test End Location 1",
             "TicketPrice": 10,
@@ -308,8 +314,8 @@ def test_get_all_route_details(Client: TestClient) -> None:
             "RouteID": 2,
             "DriverID": 2,
             "VehicleID": 2,
-            "StartTime": "2020-01-01T00:00:00",
-            "EndTime": "2020-01-01T00:00:00",
+            "StartTime": "2022-06-15T09:51:10.025000",
+            "EndTime": "2022-06-15T09:51:10.025000",
             "StartLocation": "Test Start Location 2",
             "EndLocation": "Test End Location 2",
             "TicketPrice": 20,
@@ -318,8 +324,8 @@ def test_get_all_route_details(Client: TestClient) -> None:
             "RouteID": 3,
             "DriverID": 3,
             "VehicleID": 3,
-            "StartTime": "2020-01-01T00:00:00",
-            "EndTime": "2020-01-01T00:00:00",
+            "StartTime": "2022-06-15T09:51:10.025000",
+            "EndTime": "2022-06-15T09:51:10.025000",
             "StartLocation": "Test Start Location 3",
             "EndLocation": "Test End Location 3",
             "TicketPrice": 30,
@@ -501,8 +507,8 @@ def test_get_route_by_id(
             1,
             1,
             1,
-            "2020-01-01T00:00:00Z",
-            "2020-01-01T00:00:00Z",
+            "2022-06-15T09:51:10.025Z",
+            "2022-06-15T09:51:10.025Z",
             "Test Start Location 1",
             "Test End Location 1",
             10,
@@ -511,8 +517,8 @@ def test_get_route_by_id(
             2,
             2,
             2,
-            "2020-01-01T00:00:00Z",
-            "2020-01-01T00:00:00Z",
+            "2022-06-15T09:51:10.025Z",
+            "2022-06-15T09:51:10.025Z",
             "Test Start Location 2",
             "Test End Location 2",
             20,
@@ -521,8 +527,8 @@ def test_get_route_by_id(
             3,
             3,
             3,
-            "2020-01-01T00:00:00Z",
-            "2020-01-01T00:00:00Z",
+            "2022-06-15T09:51:10.025Z",
+            "2022-06-15T09:51:10.025Z",
             "Test Start Location 3",
             "Test End Location 3",
             30,
@@ -545,9 +551,9 @@ def test_get_route_detail_by_id(
     assert response.json() == {
         "RouteID": route_id,
         "DriverID": driver_id,
-        "Vehicle_ID": vehicle_id,
-        "StartTime": start_time,
-        "EndTime": end_time,
+        "VehicleID": vehicle_id,
+        "StartTime": start_time.replace("Z", "000"),
+        "EndTime": end_time.replace("Z", "000"),
         "StartLocation": start_location,
         "EndLocation": end_location,
         "TicketPrice": ticket_price,
@@ -648,8 +654,8 @@ def test_update_route_by_id(
             1,
             1,
             1,
-            "2020-01-01T00:00:00Z",
-            "2020-01-01T00:00:00Z",
+            "2022-06-15T09:51:10.025Z",
+            "2022-06-15T09:51:10.025Z",
             "Test Start Location 1",
             "Test End Location 1",
             10,
@@ -658,8 +664,8 @@ def test_update_route_by_id(
             2,
             2,
             2,
-            "2020-01-01T00:00:00Z",
-            "2020-01-01T00:00:00Z",
+            "2022-06-15T09:51:10.025Z",
+            "2022-06-15T09:51:10.025Z",
             "Test Start Location 2",
             "Test End Location 2",
             20,
@@ -668,8 +674,8 @@ def test_update_route_by_id(
             3,
             3,
             3,
-            "2020-01-01T00:00:00Z",
-            "2020-01-01T00:00:00Z",
+            "2022-06-15T09:51:10.025Z",
+            "2022-06-15T09:51:10.025Z",
             "Test Start Location 3",
             "Test End Location 3",
             30,

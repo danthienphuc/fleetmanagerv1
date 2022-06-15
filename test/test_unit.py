@@ -25,6 +25,8 @@ def test_engine() -> Generator[AsyncEngine, None, None]:
     yield engine
 
 
+
+
 @pytest.fixture()
 async def test_session(test_engine: AsyncEngine) -> AsyncGenerator[AsyncSession, None]:
 
@@ -46,6 +48,14 @@ async def test_refresh_db(test_engine: AsyncEngine) -> None:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
+# fixture get data from csv file
+# implement data in database for testing
+# @pytest.fixture()
+# async def test_data(test_session: AsyncSession) -> AsyncGenerator[None, None]:
+#     async with test_session.begin() as conn:
+#         await conn.run_sync(Base.metadata.drop_all)
+#         await conn.run_sync(Base.metadata.create_all)
+        
 
 # Test Create
 
@@ -172,7 +182,6 @@ async def test_create_vehicle_with_same_name(
     assert response.name == name
     assert response.description == description
     assert response.fleet_id == fleet_id
-
 
 # Test create vehicle with None name raise an error
 @pytest.mark.create

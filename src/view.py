@@ -1,3 +1,4 @@
+from datetime import timezone
 import logging
 from typing import List
 from fastapi import APIRouter, Depends, Query
@@ -199,9 +200,10 @@ api_routedetail = APIRouter(prefix="/routedetails", tags=["Route Detail"])
 async def create_route_detail(
     data: schemas.RouteDetailCreate, session: AsyncSession = Depends(session)
 ) -> RouteDetail:
-    data.start_time = datetime.strptime(data.start_time, "%Y-%m-%dT%H:%M:%SZ")
-    data.end_time = datetime.strptime(data.end_time, "%Y-%m-%dT%H:%M:%SZ")
-    route_detail: RouteDetail = await create_obj_db(RouteDetail, session, **data.dict())
+    # Change time zone to UTC
+    data.start_time = data.start_time.replace(tzinfo=datetime.utcnow().tzinfo)
+    data.end_time = data.end_time.replace(tzinfo=datetime.utcnow().tzinfo)
+    route_detail: RouteDetail = await create_route_detail_obj(session, **data.dict())
     return route_detail
 
 
