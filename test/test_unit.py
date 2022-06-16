@@ -13,7 +13,6 @@ from sqlalchemy.ext.asyncio import (
 import pytest
 from ..src.controller import *
 from ..src import schemas, settings
-from load_json import load_json
 
 @pytest.fixture()
 def test_engine() -> Generator[AsyncEngine, None, None]:
@@ -47,14 +46,6 @@ async def test_refresh_db(test_engine: AsyncEngine) -> None:
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
-
-# fixture get data from csv file
-# implement data in database for testing
-# @pytest.fixture()
-# async def test_data(test_session: AsyncSession) -> AsyncGenerator[None, None]:
-#     async with test_session.begin() as conn:
-#         await conn.run_sync(Base.metadata.drop_all)
-#         await conn.run_sync(Base.metadata.create_all)
         
 
 # Test Create
@@ -246,7 +237,7 @@ async def test_create_vehicle_with_none_name_and_none_description(
         vehicle = schemas.VehicleCreate(
             name=name, description=description, fleet_id=fleet_id
         )
-        await create_obj(Vehicle, test_session, **vehicle.dict())
+        await create_vehicle_obj(test_session, **vehicle.dict())
 
 
 # Test create vehicle with fleet_id not exist

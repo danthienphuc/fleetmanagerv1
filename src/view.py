@@ -87,7 +87,7 @@ async def get_vehicles(
 async def update_vehicle(
     id: int, data: schemas.VehicleBase, session: AsyncSession = Depends(session)
 ) -> str:
-    return await update_obj(Vehicle, session, id, **data.dict())
+    return await update_vehicle_obj( session, id, **data.dict())
 
 
 # Delete vehicle
@@ -200,6 +200,7 @@ api_routedetail = APIRouter(prefix="/routedetails", tags=["Route Detail"])
 async def create_route_detail(
     data: schemas.RouteDetailCreate, session: AsyncSession = Depends(session)
 ) -> RouteDetail:
+    print("\n\n\n\n ssss \n\n\n\n")
     # Change time zone to UTC
     data.start_time = data.start_time.replace(tzinfo=datetime.utcnow().tzinfo)
     data.end_time = data.end_time.replace(tzinfo=datetime.utcnow().tzinfo)
@@ -235,6 +236,9 @@ async def update_route_detail(
     data: schemas.RouteDetailBase,
     session: AsyncSession = Depends(session),
 ) -> str:
+    # Change time zone to UTC
+    data.start_time = data.start_time.replace(tzinfo=datetime.utcnow().tzinfo)
+    data.end_time = data.end_time.replace(tzinfo=datetime.utcnow().tzinfo)
     return await update_route_detail_obj(session, route_id, vehicle_id, **data.dict())
 
 
